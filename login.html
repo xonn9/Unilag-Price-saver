@@ -308,13 +308,57 @@
                 <div id="userStatus" class="status-message"></div>
                 
                 <div class="form-group">
-                    <label>Username or Email</label>
-                    <input type="text" id="userUsername" placeholder="Enter any username">
+                    <label>Username</label>
+                    <input type="text" id="userUsername" placeholder="Enter your username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="userPassword" placeholder="Enter your password" required>
                 </div>
 
                 <button class="login-btn" onclick="loginUser()">
-                    <span id="userLoginText">Enter as User</span>
+                    <span id="userLoginText">Login</span>
                 </button>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="font-size: 14px; color: #666;">Don't have an account?</p>
+                    <button class="login-btn" onclick="switchToRegister()" style="background: #888; margin-top: 10px;">
+                        Create Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Registration -->
+            <div id="userRegister" class="form-content">
+                <h2 style="margin-bottom: 25px; color: #333;">Create Account</h2>
+                <div id="registerStatus" class="status-message"></div>
+                
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose a username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Create a password" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="regPasswordConfirm" placeholder="Confirm password" required>
+                </div>
+
+                <button class="login-btn" onclick="registerUser()">
+                    <span id="registerText">Create Account</span>
+                </button>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="font-size: 14px; color: #666;">Already have an account?</p>
+                    <button class="login-btn" onclick="switchToLogin()" style="background: #888; margin-top: 10px;">
+                        Back to Login
+                    </button>
+                </div>
             </div>
 
             <!-- Admin Login -->
@@ -344,7 +388,28 @@
     </div>
 
     <script>
-        const API_URL = 'http://127.0.0.1:8000';
+        const API_URL = 'http://172.16.142.74:8000';
+
+        // User accounts storage (localStorage-based for now)
+        function getUsers() {
+            const users = localStorage.getItem('appUsers');
+            return users ? JSON.parse(users) : {};
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('appUsers', JSON.stringify(users));
+        }
+
+        function hashPassword(password) {
+            // Simple hash function (in production, use proper hashing)
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
+        }
 
         // Switch between User and Admin login
         function switchLoginMode(mode) {
@@ -360,57 +425,141 @@
             }
         }
 
+        function switchToRegister() {
+            document.getElementById('userLogin').classList.remove('active');
+            document.getElementById('userRegister').classList.add('active');
+            document.getElementById('userStatus').className = 'status-message';
+            document.getElementById('userStatus').textContent = '';
+        }
+
+        function switchToLogin() {
+            document.getElementById('userRegister').classList.remove('active');
+            document.getElementById('userLogin').classList.add('active');
+            document.getElementById('registerStatus').className = 'status-message';
+            document.getElementById('registerStatus').textContent = '';
+        }
+
+        // User Registration
+        function registerUser() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            const statusEl = document.getElementById('registerStatus');
+            const btnEl = document.getElementById('registerText');
+
+            if (!username || !password || !passwordConfirm) {
+                statusEl.className = 'status-message error';
+                statusEl.textContent = '❌ Please fill all fields';
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                statusEl.className = 'status-message error';
+                statusEl.textContent = '❌ Passwords do not match';
+                return;
+            }
+
+            if (password.length < 4) {
+                statusEl.className = 'status-message error';
+                statusEl.textContent = '❌ Password must be at least 4 characters';
+                return;
+            }
+
+            const users = getUsers();
+            if (users[username]) {
+                statusEl.className = 'status-message error';
+                statusEl.textContent = '❌ Username already exists';
+                return;
+            }
+
+            btnEl.parentElement.disabled = true;
+            btnEl.innerHTML = '<span class="spinner"></span>Creating account...';
+
+            // Create user account
+            const userId = Date.now();
+            const userData = {
+                id: userId,
+                username: username,
+                passwordHash: hashPassword(password),
+                createdAt: new Date().toISOString(),
+                submissions: [],
+                alerts: [],
+                points: 0,
+                reputation: { score: 0, badge: 'New User' }
+            };
+
+            users[username] = userData;
+            saveUsers(users);
+
+            // Auto login after registration
+            setTimeout(() => {
+                statusEl.className = 'status-message success';
+                statusEl.textContent = '✅ Account created! Logging in...';
+                
+                // Store user session
+                localStorage.setItem('userId', userId);
+                localStorage.setItem('userName', username);
+                localStorage.setItem('userRole', 'user');
+                localStorage.setItem('loginToken', `token_${userId}_${Date.now()}`);
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                setTimeout(() => {
+                    window.location.href = 'user-dashboard.html';
+                }, 1000);
+            }, 500);
+        }
+
         // User Login
-        async function loginUser() {
+        function loginUser() {
             const username = document.getElementById('userUsername').value.trim();
+            const password = document.getElementById('userPassword').value;
             const statusEl = document.getElementById('userStatus');
             const btnEl = document.getElementById('userLoginText');
 
-            if (!username) {
+            if (!username || !password) {
                 statusEl.className = 'status-message error';
-                statusEl.textContent = '❌ Please enter a username';
+                statusEl.textContent = '❌ Please enter username and password';
                 return;
             }
 
             btnEl.parentElement.disabled = true;
             btnEl.innerHTML = '<span class="spinner"></span>Logging in...';
 
-            try {
-                const response = await fetch(`${API_URL}/login/user`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: username
-                    })
-                });
+            // Check user credentials
+            const users = getUsers();
+            const user = users[username];
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    statusEl.className = 'status-message success';
-                    statusEl.textContent = '✅ Login successful! Redirecting...';
-                    
-                    // Store user info
-                    localStorage.setItem('userId', data.user_id);
-                    localStorage.setItem('userName', data.user_name);
-                    localStorage.setItem('userRole', 'user');
-                    localStorage.setItem('loginToken', data.login_token);
-                    
-                    setTimeout(() => {
-                        window.location.href = 'user-dashboard.html';
-                    }, 1000);
-                } else {
-                    statusEl.className = 'status-message error';
-                    statusEl.textContent = '❌ ' + (data.detail || 'Login failed');
-                }
-            } catch (error) {
+            if (!user) {
                 statusEl.className = 'status-message error';
-                statusEl.textContent = '❌ Connection error. Backend running?';
-                console.error('Error:', error);
-            } finally {
+                statusEl.textContent = '❌ Username not found. Please create an account.';
                 btnEl.parentElement.disabled = false;
-                btnEl.innerHTML = 'Enter as User';
+                btnEl.innerHTML = 'Login';
+                return;
             }
+
+            const passwordHash = hashPassword(password);
+            if (user.passwordHash !== passwordHash) {
+                statusEl.className = 'status-message error';
+                statusEl.textContent = '❌ Invalid password';
+                btnEl.parentElement.disabled = false;
+                btnEl.innerHTML = 'Login';
+                return;
+            }
+
+            // Login successful
+            statusEl.className = 'status-message success';
+            statusEl.textContent = '✅ Login successful! Redirecting...';
+            
+            // Store user session
+            localStorage.setItem('userId', user.id);
+            localStorage.setItem('userName', user.username);
+            localStorage.setItem('userRole', 'user');
+            localStorage.setItem('loginToken', `token_${user.id}_${Date.now()}`);
+            localStorage.setItem('userData', JSON.stringify(user));
+            
+            setTimeout(() => {
+                window.location.href = 'user-dashboard.html';
+            }, 1000);
         }
 
         // Admin Login

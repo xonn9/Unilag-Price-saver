@@ -398,7 +398,7 @@
     <div class="nav-overlay" id="navOverlay"></div>
     <div class="nav-panel" id="navPanel">
         <h3>📱 Navigation</h3>
-        <a href="admin-dashboard.html" class="nav-item">👨‍💼 Admin</a>
+        <a href="admin-dashboard.html" class="nav-item">👨‍💼 Admin Dashboard</a>
         <a href="#" onclick="logout()" class="nav-item">🚪 Logout</a>
     </div>
 
@@ -470,9 +470,19 @@
     </div>
 
     <script>
-        const API_URL = 'http://127.0.0.1:8000';
+        const API_URL = 'http://172.16.142.74:8000';
         let allPrices = [];
         let allCategories = [];
+
+        // Access Control - Check if user is admin
+        window.addEventListener('DOMContentLoaded', () => {
+            const userRole = localStorage.getItem('userRole');
+            if (userRole !== 'admin') {
+                alert('❌ Access Denied. Admin access required.');
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+        });
 
         // Navigation Toggle
         const navToggleBtn = document.getElementById('navToggleBtn');

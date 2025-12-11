@@ -5,7 +5,7 @@ export const API_URL = (() => {
       // On Vercel, API routes are under /api prefix
       return `${window.location.origin}/api`;
     }
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    if (hostname === 'localhost' || hostname === '0.0.0.0') {
       return 'http://localhost:8000';
     }
     return `http://${hostname}:8000`;

@@ -32,7 +32,6 @@ env/
 # ========================
 # Secrets / Config (SENSITIVE)
 # ========================
-auth.py
 config/*.json
 secrets/
 

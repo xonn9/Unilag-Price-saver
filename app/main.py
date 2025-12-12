@@ -1,13 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.routers import items, prices, payments, ml, pending, stores, admin_items, auth, google_maps
 from app.database import init_db, SessionLocal
 from app.models import Category
 from contextlib import asynccontextmanager
 
+# ------------------------------
+# Lifespan: DB init + seed
+# ------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # ensure DB is created at app start
     init_db()
     
     db = SessionLocal()
@@ -20,7 +23,6 @@ async def lifespan(app: FastAPI):
 
 
 def seed_categories(db):
-    """Populate database with 3 simple categories: EDIBLES, DRINKS, NON-EDIBLES"""
     categories_data = [
         {
             "name": "EDIBLES",
@@ -43,10 +45,14 @@ def seed_categories(db):
     db.commit()
     print("✅ 3 main categories seeded! (EDIBLES, DRINKS, NON-EDIBLES)")
 
-
+# ------------------------------
+# FastAPI App
+# ------------------------------
 app = FastAPI(title="UNILAG Price Saver API", version="1.0.0", lifespan=lifespan)
 
+# ------------------------------
 # CORS Middleware
+# ------------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all for dev; restrict in production
@@ -55,20 +61,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
-app.include_router(items.router)
-app.include_router(prices.router)
-app.include_router(pending.router)
-app.include_router(payments.router)
-app.include_router(ml.router)
-app.include_router(stores.router)
-app.include_router(admin_items.router)
-app.include_router(admin_items.router_user)
-app.include_router(auth.router)
-app.include_router(google_maps.router)
+# ------------------------------
+# API Routers (all prefixed with /api)
+# ------------------------------
+app.include_router(items.router, prefix="/api")
+app.include_router(prices.router, prefix="/api")
+app.include_router(pending.router, prefix="/api")
+app.include_router(payments.router, prefix="/api")
+app.include_router(ml.router, prefix="/api")
+app.include_router(stores.router, prefix="/api")
+app.include_router(admin_items.router, prefix="/api")
+app.include_router(admin_items.router_user, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(google_maps.router, prefix="/api")
 
-
-@app.get("/")
-def home():
-    return {"status": "ok", "message": "UNILAG Price Saver API is running!"}
-
+# ------------------------------
+# Serve frontend static files
+# ------------------------------
+app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")

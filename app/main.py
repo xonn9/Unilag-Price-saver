@@ -77,11 +77,10 @@ app.include_router(google_maps.router, prefix="/api")
 # ------------------------------
 # Serve frontend static files
 # ------------------------------
-from pathlib import Path
+import os
 from fastapi.staticfiles import StaticFiles
 
-BASE_DIR = Path(__file__).resolve().parent.parent  # backend/
-FRONTEND_DIR = BASE_DIR / "frontend"
+FRONTEND_DIR = os.path.join(os.getcwd(), "frontend")
+print("Serving frontend from:", FRONTEND_DIR)  # just to debug
 
-app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
-
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

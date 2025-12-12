@@ -78,4 +78,5 @@ app.include_router(google_maps.router, prefix="/api")
 # ------------------------------
 # Serve frontend static files
 # ------------------------------
-app.mount("/", StaticFiles(directory="../frontend", html=True), name="frontend")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+

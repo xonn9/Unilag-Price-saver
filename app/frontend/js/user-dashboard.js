@@ -1,156 +1,3 @@
-// API helpers
-export const API_URL = (() => {
-    const hostname = window.location.hostname;
-    if (hostname.includes('vercel.app')) return window.location.origin;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') return 'http://localhost:8000';
-    return `http://${hostname}:8000`;
-  })();
-  
-  export async function getJSON(path) {
-    const res = await fetch(`${API_URL}${path}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  }
-  
-  export async function postJSON(path, body) {
-    const res = await fetch(`${API_URL}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Request failed');
-    return data;
-  }
-
-// localStorage helpers
-const USERS_KEY = 'appUsers';
-const SESSION_KEYS = { id:'userId', name:'userName', role:'userRole', token:'loginToken', userData:'userData', alerts: 'priceAlerts' };
-
-export function getUsers() {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); } catch { return {}; }
-}
-export function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
-
-export function getUserData() {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEYS.userData) || 'null'); } catch { return null; }
-}
-export function saveUserData(userData) {
-  localStorage.setItem(SESSION_KEYS.userData, JSON.stringify(userData));
-  const users = getUsers();
-  if (userData && userData.username) {
-    users[userData.username] = userData;
-    saveUsers(users);
-  }
-}
-
-export function getSession() {
-  return {
-    id: localStorage.getItem(SESSION_KEYS.id),
-    name: localStorage.getItem(SESSION_KEYS.name),
-    role: localStorage.getItem(SESSION_KEYS.role),
-    token: localStorage.getItem(SESSION_KEYS.token)
-  };
-}
-
-export function clearSession() {
-  Object.values(SESSION_KEYS).forEach(k => localStorage.removeItem(k));
-}
-
-export function getSavedAlerts() {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEYS.alerts) || '[]'); } catch { return []; }
-}
-export function saveAlerts(alerts) { localStorage.setItem(SESSION_KEYS.alerts, JSON.stringify(alerts)); }
-
-// helpers
-export function safeHTML(txt) {
-  const div = document.createElement('div');
-  div.textContent = txt;
-  return div.innerHTML;
-}
-
-export function formatCurrency(n) {
-  if (typeof n !== 'number') return n;
-  return `₦${n.toFixed(2)}`;
-}
-
-export function el(q) { return document.querySelector(q); }
-export function elAll(q) { return Array.from(document.querySelectorAll(q)); }
-
-// modal open/close and nav
-export function initModals() {
-  const navToggleBtn = document.getElementById('navToggleBtn');
-  const navPanel = document.getElementById('navPanel');
-  const navOverlay = document.getElementById('navOverlay');
-
-  navToggleBtn.addEventListener('click', () => {
-    const open = navPanel.classList.toggle('open');
-    navOverlay.classList.toggle('open', open);
-  });
-  navOverlay.addEventListener('click', () => { navPanel.classList.remove('open'); navOverlay.classList.remove('open'); });
-
-  // Wire nav actions via data-action (no inline onclick)
-  navPanel.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const action = btn.dataset.action;
-    document.getElementById('navPanel').classList.remove('open');
-    document.getElementById('navOverlay').classList.remove('open');
-    handleNavAction(action);
-  });
-
-  // Close buttons
-  document.getElementById('locationModalClose').addEventListener('click', () => closeModal('locationModal'));
-  document.getElementById('locationModalCancel').addEventListener('click', () => closeModal('locationModal'));
-  document.getElementById('locationModalConfirm').addEventListener('click', () => { /* handled in map module via event */ });
-
-  // Alert modal buttons
-  document.getElementById('alertCancelBtn').addEventListener('click', () => closeModal('alertModal'));
-  document.getElementById('alertSaveBtn').addEventListener('click', () => { /* handler attached elsewhere */ });
-
-  // Retailer close
-  document.getElementById('retailerCloseBtn').addEventListener('click', () => closeModal('retailerModal'));
-
-  // Category insights / profile closes
-  document.getElementById('categoryInsightsClose')?.addEventListener('click', () => closeModal('categoryInsightsModal'));
-  document.getElementById('profileCloseBtn')?.addEventListener('click', () => closeModal('profileModal'));
-
-  // mobile nav buttons
-  document.getElementById('mobileBottomNav')?.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    handleNavAction(btn.dataset.action);
-  });
-}
-
-export function openModal(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add('open');
-  el.setAttribute('aria-hidden', 'false');
-}
-export function closeModal(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove('open');
-  el.setAttribute('aria-hidden', 'true');
-}
-
-// Nav action dispatcher (exported so other modules can use it)
-export function handleNavAction(action) {
-  switch(action) {
-    case 'home': document.querySelector('.mobile-nav-item[data-action="home"]')?.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); break;
-    case 'trends': openModal('categoryInsightsModal'); break;
-    case 'insights': openModal('categoryInsightsModal'); break;
-    case 'alerts': openModal('alertModal'); break;
-    case 'profile': openModal('profileModal'); break;
-    case 'logout': localStorage.clear(); window.location.href = 'login.html'; break;
-    case 'submit': document.getElementById('priceForm').scrollIntoView({ behavior: 'smooth' }); break;
-    case 'map': openModal('locationModal'); break;
-    default: console.log('nav action:', action);
-  }
-}
-
 /**
  * User dashboard entrypoint (ES module)
  * - Loads categories/prices
@@ -198,11 +45,23 @@ function setupNav() {
 
   navPanel?.addEventListener('click', (e) => {
     const action = e.target.closest('[data-action]')?.dataset.action;
-    if (action) handleNavAction(action);
+    if (action) {
+      navPanel.classList.remove('open');
+      navOverlay.classList.remove('open');
+      handleNavAction(action);
+    }
   });
   mobileNav?.addEventListener('click', (e) => {
-    const action = e.target.closest('[data-action]')?.dataset.action;
-    if (action) handleNavAction(action);
+    const btn = e.target.closest('[data-action]');
+    if (btn) {
+      const action = btn.dataset.action;
+      // Update active state for mobile nav
+      mobileNav.querySelectorAll('.mobile-nav-item').forEach(item => item.classList.remove('active'));
+      if (action === 'home') {
+        btn.classList.add('active');
+      }
+      handleNavAction(action);
+    }
   });
 
   const darkModeBtn = document.getElementById('darkModeBtn');
@@ -219,20 +78,100 @@ function setupNav() {
       applyPref();
     });
   }
+  
+  // Close modal buttons
+  document.getElementById('categoryInsightsClose')?.addEventListener('click', () => closeModal('categoryInsightsModal'));
+  document.getElementById('profileCloseBtn')?.addEventListener('click', () => closeModal('profileModal'));
+}
+
+// Modal and navigation handlers
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('open');
+  el.setAttribute('aria-hidden', 'false');
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('open');
+  el.setAttribute('aria-hidden', 'true');
 }
 
 function handleNavAction(action) {
   switch (action) {
-    case 'home': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
+    case 'home':
+      document.querySelector('.mobile-nav-item[data-action="home"]')?.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      break;
     case 'trends':
-    case 'insights': openModal('categoryInsightsModal'); break;
-    case 'alerts': openModal('alertModal'); break;
-    case 'profile': openModal('profileModal'); break;
-    case 'logout': localStorage.clear(); window.location.href = appPath('login.html'); break;
-    case 'submit': document.getElementById('priceForm')?.scrollIntoView({ behavior: 'smooth' }); break;
-    case 'map': openModal('locationModal'); break;
-    default: break;
+    case 'insights':
+      populateCategoryInsights();
+      openModal('categoryInsightsModal');
+      break;
+    case 'alerts':
+      openModal('alertModal');
+      break;
+    case 'profile':
+      populateProfileModal();
+      openModal('profileModal');
+      break;
+    case 'logout':
+      localStorage.clear();
+      window.location.href = appPath('login.html');
+      break;
+    case 'submit':
+      document.getElementById('priceForm')?.scrollIntoView({ behavior: 'smooth' });
+      break;
+    case 'map':
+      openModal('locationModal');
+      break;
+    default:
+      console.log('nav action:', action);
+      break;
   }
+}
+
+function populateCategoryInsights() {
+  const content = document.getElementById('categoryInsightsContent');
+  if (!content) return;
+  
+  const insights = allCategories.map(cat => {
+    const catPrices = allPrices.filter(p => p.category_id === cat.id);
+    const avgPrice = catPrices.length 
+      ? (catPrices.reduce((sum, p) => sum + (p.price || 0), 0) / catPrices.length).toFixed(2)
+      : 0;
+    const count = catPrices.length;
+    return `
+      <div style="padding:1rem;border-bottom:1px solid #ddd;">
+        <h4>${cat.icon || ''} ${cat.name}</h4>
+        <p>Total Prices: ${count}</p>
+        <p>Average Price: ${formatCurrency(parseFloat(avgPrice))}</p>
+      </div>
+    `;
+  }).join('');
+  
+  content.innerHTML = insights || '<p>No category data available yet.</p>';
+}
+
+function populateProfileModal() {
+  const content = document.getElementById('profileContent');
+  if (!content) return;
+  
+  const session = getSession();
+  const userData = getUserData();
+  const submissions = allPrices.filter(p => p.submitted_by === parseInt(session.id || '0'));
+  const submissionCount = submissions.length;
+  
+  content.innerHTML = `
+    <div style="padding:1rem;">
+      <h4>👤 ${safeHTML(session.name || 'User')}</h4>
+      <p><strong>Role:</strong> ${safeHTML(session.role || 'user')}</p>
+      <p><strong>Total Submissions:</strong> ${submissionCount}</p>
+      <p><strong>Account Status:</strong> Active</p>
+    </div>
+  `;
 }
 
 function setupFilters() {
@@ -350,20 +289,6 @@ function setupLocationModal() {
       alert('Enter a location or pick on the map');
     }
   });
-}
-
-function openModal(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add('open');
-  el.setAttribute('aria-hidden', 'false');
-}
-
-function closeModal(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.remove('open');
-  el.setAttribute('aria-hidden', 'true');
 }
 
 function bindFormSubmit() {

@@ -33,7 +33,7 @@ def seed_categories(db):
         },
         {
             "name": "NON-EDIBLES",
-            "description": "Everything else: soap, detergent, cooking oil bottles, toothbrush, batteries, kitchen utensils, diapers, toiletries"
+            "description": "Everything else: soap, detergent, oil bottles, toothbrush, batteries, utensils, diapers, toiletries"
         }
     ]
     
@@ -44,24 +44,27 @@ def seed_categories(db):
     db.commit()
     print("✅ 3 main categories seeded! (EDIBLES, DRINKS, NON-EDIBLES)")
 
+
 # ------------------------------
 # FastAPI App
 # ------------------------------
 app = FastAPI(title="UNILAG Price Saver API", version="1.0.0", lifespan=lifespan)
 
+
 # ------------------------------
-# CORS Middleware
+# CORS
 # ------------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all for dev; restrict in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 # ------------------------------
-# API Routers (all prefixed with /api)
+# API Routers (/api)
 # ------------------------------
 app.include_router(items.router, prefix="/api")
 app.include_router(prices.router, prefix="/api")
@@ -75,12 +78,49 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(google_maps.router, prefix="/api")
 
 # ------------------------------
-# Serve frontend static files
+# Serve Frontend (STATIC + HTML)
 # ------------------------------
-import os
+from pathlib import Path
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
-FRONTEND_DIR = os.path.join(os.getcwd(), "frontend")
-print("Serving frontend from:", FRONTEND_DIR)  # just to debug
+BASE_DIR = Path(__file__).resolve().parent              # backend/app
+FRONTEND_DIR = BASE_DIR / "frontend"                    # backend/app/frontend
 
-app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+# Check if frontend directory exists, if not, try root level
+if not FRONTEND_DIR.exists():
+    # Try parent directory (if frontend was moved to backend/frontend)
+    ROOT_FRONTEND = BASE_DIR.parent / "frontend"
+    if ROOT_FRONTEND.exists():
+        FRONTEND_DIR = ROOT_FRONTEND
+    else:
+        # Try current directory as fallback
+        FRONTEND_DIR = BASE_DIR
+
+# 1) Serve static files correctly (only if directory exists)
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+    
+    # 2) Serve login.html as home page
+    @app.get("/", include_in_schema=False)
+    async def serve_root():
+        login_path = FRONTEND_DIR / "login.html"
+        if login_path.exists():
+            return FileResponse(login_path)
+        return {"message": "Frontend files not found"}
+    
+    # Serve other HTML files
+    @app.get("/user-dashboard.html", include_in_schema=False)
+    async def serve_user_dashboard():
+        dashboard_path = FRONTEND_DIR / "user-dashboard.html"
+        if dashboard_path.exists():
+            return FileResponse(dashboard_path)
+        return {"error": "File not found"}
+    
+    @app.get("/admin-dashboard.html", include_in_schema=False)
+    async def serve_admin_dashboard():
+        dashboard_path = FRONTEND_DIR / "admin-dashboard.html"
+        if dashboard_path.exists():
+            return FileResponse(dashboard_path)
+        return {"error": "File not found"}
+

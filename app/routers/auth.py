@@ -1,6 +1,11 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Header
+"""
+Fixed Authentication Router - JWT + Argon2
+Clean implementation with proper error handling
+"""
+
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import User
@@ -10,39 +15,30 @@ import os
 import json
 from dotenv import load_dotenv
 
-# --- Workaround / monkeypatch for passlib <-> bcrypt version mismatch ---
-# If your environment installs bcrypt>=4.x, passlib may try to read bcrypt.__about__.__version__
-# which doesn't exist in some bcrypt releases. This small shim avoids that crash.
+# Argon2 for password hashing (install: pip install argon2-cffi)
 try:
-    import bcrypt as _bcrypt
-    if not hasattr(_bcrypt, "__about__"):
-        class _About:
-            pass
-        _about = _About()
-        # bcrypt might expose __version__; if not, fallback to a sensible default string
-        _about.__version__ = getattr(_bcrypt, "__version__", "3.2.2")
-        _bcrypt.__about__ = _about
-except Exception:
-    # If bcrypt import fails here, passlib will still error later; we'll still surface a clear error.
-    pass
+    from argon2 import PasswordHasher
+    from argon2.exceptions import VerifyMismatchError, InvalidHash
+    ARGON2_AVAILABLE = True
+except ImportError:
+    ARGON2_AVAILABLE = False
+    print("⚠️  argon2-cffi not installed. Run: pip install argon2-cffi")
 
-# Now import passlib after the monkeypatch
-from passlib.context import CryptContext
-
-# You may choose a JWT library explicitly; this code assumes 'pyjwt' or 'python-jose' interface.
-# If you're using python-jose DO: from jose import jwt, JWTError, ExpiredSignatureError
-import jwt
+# JWT library (install: pip install pyjwt)
+try:
+    import jwt
+    JWT_AVAILABLE = True
+except ImportError:
+    JWT_AVAILABLE = False
+    print("⚠️  PyJWT not installed. Run: pip install pyjwt")
 
 load_dotenv()
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
-
-# Security Configuration
-# Keep bcrypt as scheme; we'll pre-hash with sha256 to avoid 72-byte limit.
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
+# Configuration
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
@@ -54,6 +50,17 @@ try:
 except:
     ADMIN_USERNAMES = ["admin"]
 
+# Initialize Argon2 hasher with secure defaults
+if ARGON2_AVAILABLE:
+    ph = PasswordHasher(
+        time_cost=2,        # Number of iterations
+        memory_cost=65536,  # 64 MB
+        parallelism=1,      # Number of threads
+        hash_len=32,        # Length of hash
+        salt_len=16         # Length of salt
+    )
+
+# ==================== DATABASE ====================
 
 def get_db():
     db = SessionLocal()
@@ -62,91 +69,134 @@ def get_db():
     finally:
         db.close()
 
-
-# -------------------------------
-# Password helpers (fixed)
-# -------------------------------
-import hashlib
-
-def _prehash_password_bytes(password: str) -> bytes:
-    """
-    Convert the incoming password string into a fixed-length binary digest (SHA-256).
-    This removes bcrypt's 72-byte limit and is safe when combined with bcrypt.
-    """
-    if isinstance(password, str):
-        password = password.encode("utf-8")
-    # returns raw 32-byte digest
-    return hashlib.sha256(password).digest()
-
+# ==================== PASSWORD HASHING (ARGON2) ====================
 
 def hash_password(password: str) -> str:
     """
-    Hash password using: bcrypt( SHA256(password) )
-    Returns the passlib-managed bcrypt hash (string).
+    Hash password using Argon2id
+    Returns Argon2 hash string
     """
-    digest = _prehash_password_bytes(password)
-    # passlib will accept bytes for hashing
-    return pwd_context.hash(digest)
+    if not ARGON2_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Password hashing not available. Install argon2-cffi"
+        )
+    
+    if not password:
+        raise ValueError("Password cannot be empty")
+    
+    try:
+        return ph.hash(password)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to hash password: {str(e)}"
+        )
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-    Verify the provided plain password against the stored hash.
-    Strategy:
-      1. Try new scheme: bcrypt( sha256(plain_password) )
-      2. Fallback: bcrypt(plain_password)  <-- handles existing users that used old scheme
+    Verify password against Argon2 hash
+    Returns True if password matches, False otherwise
     """
-    digest = _prehash_password_bytes(plain_password)
-
-    # 1) Try new pre-hash verify first
+    if not ARGON2_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Password verification not available. Install argon2-cffi"
+        )
+    
     try:
-        if pwd_context.verify(digest, hashed_password):
-            return True
-    except Exception:
-        # ignore and try fallback
-        pass
-
-    # 2) Fallback: older users who may have had their plain password string passed to bcrypt
-    try:
-        return pwd_context.verify(plain_password, hashed_password)
-    except Exception:
+        ph.verify(hashed_password, plain_password)
+        
+        # Check if hash needs rehashing (parameters changed)
+        if ph.check_needs_rehash(hashed_password):
+            return True  # Still valid, but caller should rehash
+        
+        return True
+    except VerifyMismatchError:
+        return False
+    except InvalidHash:
+        # Handle legacy hashes or corrupted data
+        return False
+    except Exception as e:
+        print(f"Password verification error: {e}")
         return False
 
 
-# -------------------------------
-# JWT helpers (unchanged, but keep an eye on library)
-# -------------------------------
+def needs_rehash(hashed_password: str) -> bool:
+    """Check if password hash needs to be updated"""
+    if not ARGON2_AVAILABLE:
+        return False
+    
+    try:
+        return ph.check_needs_rehash(hashed_password)
+    except:
+        return False
+
+# ==================== JWT TOKENS ====================
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Create JWT access token"""
+    if not JWT_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="JWT not available. Install pyjwt"
+        )
+    
     to_encode = data.copy()
-
+    
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.utcnow(),
+        "type": "access"
+    })
+    
+    try:
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create token: {str(e)}"
+        )
 
 
 def decode_access_token(token: str) -> dict:
     """Decode and verify JWT token"""
+    if not JWT_AVAILABLE:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="JWT not available"
+        )
+    
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired"
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"}
         )
-    except Exception:
-        # Broad catch here; adjust if you use a specific JWT lib with specific exception classes
+    except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
+            detail="Invalid authentication token",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token validation failed: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"}
         )
 
+# ==================== DEPENDENCIES ====================
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -155,21 +205,21 @@ async def get_current_user(
     """Get current user from JWT token"""
     token = credentials.credentials
     payload = decode_access_token(token)
-
+    
     user_id = payload.get("sub")
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials"
+            detail="Invalid token payload"
         )
-
+    
     user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found"
         )
-
+    
     return user
 
 
@@ -182,12 +232,28 @@ async def get_current_admin(current_user: User = Depends(get_current_user)) -> U
         )
     return current_user
 
+# ==================== SCHEMAS ====================
 
-# Schemas
 class UserRegisterRequest(BaseModel):
     username: str
     password: str
     email: Optional[str] = None
+    
+    @validator('username')
+    def username_validator(cls, v):
+        if not v or len(v.strip()) < 3:
+            raise ValueError('Username must be at least 3 characters')
+        if len(v) > 50:
+            raise ValueError('Username too long (max 50 characters)')
+        return v.strip()
+    
+    @validator('password')
+    def password_validator(cls, v):
+        if not v or len(v) < 4:
+            raise ValueError('Password must be at least 4 characters')
+        if len(v) > 128:
+            raise ValueError('Password too long (max 128 characters)')
+        return v
 
 
 class UserLoginRequest(BaseModel):
@@ -204,170 +270,216 @@ class LoginResponse(BaseModel):
     success: bool
     user_id: Optional[int] = None
     user_name: Optional[str] = None
-    admin_id: Optional[str] = None
+    admin_id: Optional[int] = None
     admin_name: Optional[str] = None
     user_role: str
     access_token: str
     token_type: str = "bearer"
     message: str
 
+# ==================== ENDPOINTS ====================
 
-# Endpoints
 @router.post("/register", response_model=LoginResponse)
-async def register_user(request: UserRegisterRequest, db: Session = Depends(get_db)):
-    """Register new user with bcrypt password hashing"""
-
-    # Validation
-    if not request.username or not request.password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username and password are required"
-        )
-
-    if len(request.password) < 4:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 4 characters"
-        )
-
-    # Check existing user
-    existing_user = db.query(User).filter(User.username == request.username).first()
+async def register_user(
+    request: UserRegisterRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Register new user with Argon2 password hashing
+    
+    Requirements:
+    - Username: 3-50 characters, unique
+    - Password: 4-128 characters
+    - Email: Optional
+    
+    Returns JWT access token valid for 24 hours
+    """
+    
+    # Check if username exists
+    existing_user = db.query(User).filter(
+        User.username == request.username
+    ).first()
+    
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Username already exists"
         )
-
-    # Create user with bcrypt hashed password (we pre-hash inside hash_password)
-    password_hash = hash_password(request.password)
-    new_user = User(
-        username=request.username,
-        password_hash=password_hash,
-        email=request.email,
-        display_name=request.username,
-        role="user",
-        created_at=datetime.utcnow()
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    # Create access token
-    access_token = create_access_token(
-        data={"sub": str(new_user.id), "role": "user"}
-    )
-
-    return LoginResponse(
-        success=True,
-        user_id=new_user.id,
-        user_name=new_user.username,
-        user_role="user",
-        access_token=access_token,
-        token_type="bearer",
-        message=f"User {request.username} registered successfully!"
-    )
+    
+    # Check email if provided
+    if request.email:
+        existing_email = db.query(User).filter(
+            User.email == request.email
+        ).first()
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already registered"
+            )
+    
+    try:
+        # Hash password with Argon2
+        password_hash = hash_password(request.password)
+        
+        # Create new user
+        new_user = User(
+            username=request.username,
+            password_hash=password_hash,
+            email=request.email,
+            display_name=request.username,
+            role="user",
+            created_at=datetime.utcnow()
+        )
+        
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        # Create access token
+        access_token = create_access_token(
+            data={
+                "sub": str(new_user.id),
+                "username": new_user.username,
+                "role": "user"
+            }
+        )
+        
+        return LoginResponse(
+            success=True,
+            user_id=new_user.id,
+            user_name=new_user.username,
+            user_role="user",
+            access_token=access_token,
+            token_type="bearer",
+            message=f"Welcome to UNILAG Price Saver, {request.username}!"
+        )
+        
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Registration failed: {str(e)}"
+        )
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login_user(request: UserLoginRequest, db: Session = Depends(get_db)):
-    """Login user with bcrypt password verification"""
-
+async def login_user(
+    request: UserLoginRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Login user with username and password
+    
+    Returns JWT access token valid for 24 hours
+    """
+    
     if not request.username or not request.password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username and password are required"
         )
-
+    
     # Find user
-    user = db.query(User).filter(User.username == request.username).first()
+    user = db.query(User).filter(
+        User.username == request.username
+    ).first()
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password"
         )
-
-    # Verify password with prioritized new scheme
-    # We will detect if fallback was used so we can re-hash the stored password
-    used_fallback = False
-    digest = _prehash_password_bytes(request.password)
-
+    
+    # Verify password
     try:
-        if pwd_context.verify(digest, user.password_hash):
-            verified = True
-        else:
-            # fallback
-            if pwd_context.verify(request.password, user.password_hash):
-                verified = True
-                used_fallback = True
-            else:
-                verified = False
-    except Exception:
-        # try fallback robustly
-        try:
-            verified = pwd_context.verify(request.password, user.password_hash)
-            if verified:
-                used_fallback = True
-        except Exception:
-            verified = False
-
-    if not verified:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid username or password"
+        is_valid = verify_password(request.password, user.password_hash)
+        
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password"
+            )
+        
+        # Check if password needs rehashing (security upgrade)
+        if needs_rehash(user.password_hash):
+            try:
+                user.password_hash = hash_password(request.password)
+                db.add(user)
+                db.commit()
+            except:
+                pass  # Don't fail login if rehash fails
+        
+        # Create access token
+        access_token = create_access_token(
+            data={
+                "sub": str(user.id),
+                "username": user.username,
+                "role": user.role
+            }
         )
-
-    # If the user was verified using the old scheme (fallback), upgrade their stored hash
-    if used_fallback:
-        try:
-            user.password_hash = hash_password(request.password)
-            db.add(user)
-            db.commit()
-        except Exception:
-            # do not fail login if re-hash/update fails; but log in real app
-            pass
-
-    # Create access token
-    access_token = create_access_token(
-        data={"sub": str(user.id), "role": user.role}
-    )
-
-    return LoginResponse(
-        success=True,
-        user_id=user.id,
-        user_name=user.username,
-        user_role=user.role,
-        access_token=access_token,
-        token_type="bearer",
-        message=f"Welcome back, {user.username}!"
-    )
+        
+        return LoginResponse(
+            success=True,
+            user_id=user.id,
+            user_name=user.username,
+            user_role=user.role,
+            access_token=access_token,
+            token_type="bearer",
+            message=f"Welcome back, {user.username}!"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Login failed: {str(e)}"
+        )
 
 
 @router.post("/admin", response_model=LoginResponse)
-async def login_admin(request: AdminLoginRequest, db: Session = Depends(get_db)):
-    """Admin login with API key verification"""
-
+async def login_admin(
+    request: AdminLoginRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Admin login with API key verification
+    
+    Requires:
+    - username: Must be in ADMIN_USERNAMES list
+    - admin_key: Must match ADMIN_API_KEY
+    
+    Returns JWT access token with admin role
+    """
+    
     if not request.username or not request.admin_key:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username and admin key are required"
         )
-
+    
     # Verify admin username
     if request.username not in ADMIN_USERNAMES:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid admin username"
+            detail="Invalid admin credentials"
         )
-
+    
     # Verify admin key
     if request.admin_key != ADMIN_API_KEY:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid admin key"
+            detail="Invalid admin credentials"
         )
-
+    
     # Get or create admin user
-    admin_user = db.query(User).filter(User.username == request.username).first()
+    admin_user = db.query(User).filter(
+        User.username == request.username
+    ).first()
+    
     if not admin_user:
         admin_user = User(
             username=request.username,
@@ -378,22 +490,26 @@ async def login_admin(request: AdminLoginRequest, db: Session = Depends(get_db))
         db.add(admin_user)
         db.commit()
         db.refresh(admin_user)
-
+    
     # Ensure user has admin role
     if admin_user.role != "admin":
         admin_user.role = "admin"
         db.commit()
-
+    
     # Create access token
     access_token = create_access_token(
-        data={"sub": str(admin_user.id), "role": "admin"}
+        data={
+            "sub": str(admin_user.id),
+            "username": admin_user.username,
+            "role": "admin"
+        }
     )
-
+    
     admin_name = request.username.replace("_", " ").title()
-
+    
     return LoginResponse(
         success=True,
-        admin_id=str(admin_user.id),
+        admin_id=admin_user.id,
         admin_name=admin_name,
         user_role="admin",
         access_token=access_token,
@@ -404,16 +520,24 @@ async def login_admin(request: AdminLoginRequest, db: Session = Depends(get_db))
 
 @router.post("/logout")
 async def logout():
-    """Logout (client should delete token)"""
+    """
+    Logout user
+    
+    Note: JWT tokens are stateless, so logout is handled client-side
+    by deleting the token. Server cannot invalidate tokens unless using
+    a token blacklist (not implemented here).
+    """
     return {
         "success": True,
-        "message": "Logged out successfully! Please delete your token."
+        "message": "Logged out successfully. Please delete your token."
     }
 
 
 @router.get("/me")
-async def get_current_user_info(current_user: User = Depends(get_current_user)):
-    """Get current user information"""
+async def get_current_user_info(
+    current_user: User = Depends(get_current_user)
+):
+    """Get current authenticated user information"""
     return {
         "id": current_user.id,
         "username": current_user.username,
@@ -426,8 +550,10 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/validate-token")
-async def validate_token(current_user: User = Depends(get_current_user)):
-    """Validate JWT token"""
+async def validate_token(
+    current_user: User = Depends(get_current_user)
+):
+    """Validate JWT token and return user info"""
     return {
         "valid": True,
         "user_id": current_user.id,
@@ -437,13 +563,31 @@ async def validate_token(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/refresh")
-async def refresh_token(current_user: User = Depends(get_current_user)):
-    """Refresh access token"""
+async def refresh_token(
+    current_user: User = Depends(get_current_user)
+):
+    """Refresh access token (issue new token)"""
     new_token = create_access_token(
-        data={"sub": str(current_user.id), "role": current_user.role}
+        data={
+            "sub": str(current_user.id),
+            "username": current_user.username,
+            "role": current_user.role
+        }
     )
-
+    
     return {
         "access_token": new_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "message": "Token refreshed successfully"
+    }
+
+
+@router.get("/health")
+async def auth_health():
+    """Check authentication system health"""
+    return {
+        "status": "healthy",
+        "argon2_available": ARGON2_AVAILABLE,
+        "jwt_available": JWT_AVAILABLE,
+        "algorithm": ALGORITHM
     }

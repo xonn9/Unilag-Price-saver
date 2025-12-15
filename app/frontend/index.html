@@ -1,912 +1,920 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNILAG Price Saver - Smart Shopping Made Easy</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #007AFF;
-            --success: #34C759;
-            --warning: #FF9500;
-            --danger: #FF3B30;
-            --light: #F2F2F7;
-            --dark: #1C1C1E;
-            --text: #000;
-            --bg: #fff;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4rem 2rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            margin-bottom: 1rem;
-            font-weight: 800;
-        }
-
-        .hero .subtitle {
-            font-size: clamp(1.1rem, 3vw, 1.5rem);
-            opacity: 0.95;
-            margin-bottom: 2rem;
-        }
-
-        .hero-cta {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-hero {
-            padding: 1.2rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: white;
-            color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255,255,255,0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 2px solid white;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Stats Section */
-        .stats {
-            background: var(--light);
-            padding: 3rem 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 1rem;
-        }
-
-        /* Features Section */
-        .features {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 2rem;
-        }
-
-        .features h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--dark);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.8rem;
-            color: var(--primary);
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        /* Demo Section */
-        .demo-section {
-            background: linear-gradient(to bottom, white 0%, var(--light) 100%);
-            padding: 4rem 2rem;
-        }
-
-        .demo-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .demo-section h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .demo-subtitle {
-            text-align: center;
-            color: #666;
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-        }
-
-        .demo-container {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-        }
-
-        /* Interactive Demo */
-        .demo-basket {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .demo-input {
-            background: var(--light);
-            padding: 1.5rem;
-            border-radius: 12px;
-        }
-
-        .demo-input h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .demo-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-        }
-
-        .demo-results {
-            background: var(--light);
-            padding: 1.5rem;
-            border-radius: 12px;
-        }
-
-        .demo-store-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--success);
-        }
-
-        .demo-store-card.maybe {
-            border-left-color: var(--warning);
-        }
-
-        .demo-store-card.not-worth {
-            border-left-color: #ddd;
-        }
-
-        .demo-verdict {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .demo-verdict.worth {
-            background: var(--success);
-            color: white;
-        }
-
-        .demo-verdict.maybe {
-            background: var(--warning);
-            color: white;
-        }
-
-        .demo-verdict.not {
-            background: #ddd;
-            color: #666;
-        }
-
-        .demo-saving {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--success);
-            margin: 0.5rem 0;
-        }
-
-        .demo-blur {
-            position: relative;
-        }
-
-        .demo-blur::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.95) 60%);
-            backdrop-filter: blur(4px);
-            border-radius: 12px;
-        }
-
-        .demo-cta-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-        }
-
-        .demo-cta-overlay h3 {
-            margin-bottom: 1rem;
-            font-size: 1.8rem;
-            color: var(--dark);
-        }
-
-        .demo-cta-overlay p {
-            margin-bottom: 1.5rem;
-            color: #666;
-        }
-
-        /* How It Works */
-        .how-it-works {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 2rem;
-        }
-
-        .how-it-works h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--dark);
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary) 0%, #0051D5 100%);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin: 0 auto 1rem;
-        }
-
-        .step h3 {
-            margin-bottom: 0.8rem;
-            color: var(--dark);
-        }
-
-        .step p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        /* Testimonials */
-        .testimonials {
-            background: var(--light);
-            padding: 4rem 2rem;
-        }
-
-        .testimonials h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--dark);
-        }
-
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .testimonial-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .testimonial-stars {
-            color: #FFD700;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-
-        .testimonial-text {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .testimonial-author {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .testimonial-role {
-            color: #999;
-            font-size: 0.9rem;
-        }
-
-        /* Final CTA */
-        .final-cta {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .final-cta h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .final-cta p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.95;
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--dark);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-
-        .footer-links a:hover {
-            opacity: 1;
-        }
-
-        /* Sign-up Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-
-        .modal.open {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            max-width: 500px;
-            width: 100%;
-            padding: 2rem;
-            position: relative;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #999;
-        }
-
-        .modal h2 {
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid var(--light);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 1rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-submit:hover {
-            background: #0051D5;
-            transform: translateY(-2px);
-        }
-
-        .modal-footer {
-            text-align: center;
-            margin-top: 1rem;
-            color: #666;
-        }
-
-        .modal-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .demo-basket {
-                grid-template-columns: 1fr;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .features-grid,
-            .steps,
-            .testimonial-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNILAG Price Saver - Smart Campus Shopping</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5568d3;
+      --secondary: #764ba2;
+      --accent: #f093fb;
+      --success: #34C759;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --text: #333;
+      --border: #e0e0e0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background: var(--light);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-100px); }
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+
+    nav.scrolled {
+      padding: 0.8rem 5%;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .btn {
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-outline {
+      border: 2px solid white;
+      color: white;
+    }
+
+    .btn-outline:hover {
+      background: white;
+      color: var(--primary);
+    }
+
+    .hero-content {
+      text-align: center;
+      color: white;
+      z-index: 1;
+      max-width: 800px;
+      padding: 2rem;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Live Demo Section */
+    .demo-section {
+      padding: 5rem 5%;
+      background: white;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+    }
+
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--light);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .demo-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .demo-tab {
+      padding: 1rem 2rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #666;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .demo-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .demo-content {
+      display: none;
+      animation: fadeIn 0.5s;
+    }
+
+    .demo-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .price-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .price-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .price-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+
+    .price-card h3 {
+      font-size: 1.3rem;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .category-tag {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .price-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--success);
+    }
+
+    .price-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .price-detail {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .price-detail-label {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+
+    .price-detail-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Features Section */
+    .features-section {
+      padding: 5rem 5%;
+      background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      transition: all 0.3s;
+      border: 1px solid var(--border);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .feature-card p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      padding: 5rem 5%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .stat-item h2 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      animation: countUp 2s ease-out;
+    }
+
+    .stat-item p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 5rem 5%;
+      text-align: center;
+      background: white;
+    }
+
+    .cta-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .cta-content h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .cta-content p {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 3rem 5%;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: white;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Loading Animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: left 0.3s;
+      }
+
+      .nav-links.active {
+        left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .demo-tabs {
+        flex-wrap: wrap;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>🛒 Smart Shopping Made Simple</h1>
-            <p class="subtitle">Compare prices across UNILAG stores and find the best value, not just the cheapest price</p>
-            <div class="hero-cta">
-                <button class="btn-hero btn-primary" onclick="openSignupModal()">Get Started Free</button>
-                <a href="#demo" class="btn-hero btn-secondary">See How It Works</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stat-card">
-            <div class="stat-number">50+</div>
-            <div class="stat-label">Campus Stores</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">1000+</div>
-            <div class="stat-label">Price Updates</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">₦500+</div>
-            <div class="stat-label">Avg. Savings</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">500+</div>
-            <div class="stat-label">Happy Students</div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-        <h2>Why Students Love Us</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3>Smart Comparison</h3>
-                <p>We don't just show you the cheapest price; we calculate if it's worth switching stores after factoring in transport costs and your time.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🗺️</div>
-                <h3>Location-Aware</h3>
-                <p>Get recommendations based on stores near you. See exactly how far you'll need to travel and get directions instantly.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Real-Time Updates</h3>
-                <p>Prices are crowdsourced by students like you. Get the latest prices updated daily across all campus stores.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔔</div>
-                <h3>Price Alerts</h3>
-                <p>Set alerts for your favorite items. Get notified when prices drop or when switching stores becomes worth it.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🛍️</div>
-                <h3>Basket Shopping</h3>
-                <p>Shopping for multiple items? Build your basket and we'll find the best overall value across all stores.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🤝</div>
-                <h3>Community-Driven</h3>
-                <p>Powered by students, for students. Contribute prices and help the UNILAG community save money together.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Demo Section -->
-    <section class="demo-section" id="demo">
-        <div class="demo-content">
-            <h2>See It In Action</h2>
-            <p class="demo-subtitle">Here's how we help you make smarter shopping decisions</p>
-            
-            <div class="demo-container">
-                <div class="demo-basket">
-                    <div class="demo-input">
-                        <h3>📝 Your Basket</h3>
-                        <div class="demo-item">
-                            <span><strong>Rice</strong> (2kg)</span>
-                            <span>₦3,500</span>
-                        </div>
-                        <div class="demo-item">
-                            <span><strong>Beans</strong> (1kg)</span>
-                            <span>₦1,800</span>
-                        </div>
-                        <div class="demo-item">
-                            <span><strong>Peak Milk</strong> (380g)</span>
-                            <span>₦1,200</span>
-                        </div>
-                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--light);">
-                            <strong>Total: ₦6,500</strong>
-                        </div>
-                    </div>
-
-                    <div class="demo-results demo-blur">
-                        <h3>🏪 Best Options</h3>
-                        
-                        <div class="demo-store-card">
-                            <span class="demo-verdict worth">✅ Worth Switching!</span>
-                            <h4>Shoprite Express</h4>
-                            <p style="color: #666; margin: 0.5rem 0;">📍 1.2 km away • 🕐 12 min</p>
-                            <div class="demo-saving">Save ₦450</div>
-                            <p style="color: #666; font-size: 0.9rem;">Net saving after ₦100 transport cost</p>
-                        </div>
-
-                        <div class="demo-store-card maybe">
-                            <span class="demo-verdict maybe">⚠️ Maybe</span>
-                            <h4>Campus Mini-Mart</h4>
-                            <p style="color: #666; margin: 0.5rem 0;">📍 0.8 km away • 🕐 8 min</p>
-                            <div class="demo-saving" style="color: var(--warning);">Save ₦150</div>
-                        </div>
-
-                        <div class="demo-cta-overlay">
-                            <h3>🎯 Want to see your results?</h3>
-                            <p>Create a free account to access smart shopping recommendations</p>
-                            <button class="btn-hero btn-primary" onclick="openSignupModal()">Sign Up - It's Free</button>
-                            <p style="margin-top: 1rem; font-size: 0.9rem;">Already have an account? <a href="login.html" style="color: var(--primary); font-weight: 600;">Log in</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works">
-        <h2>How It Works</h2>
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <h3>Add Your Items</h3>
-                <p>Build your shopping basket with items you want to buy. Add quantities and brands.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">2</div>
-                <h3>We Calculate</h3>
-                <p>Our smart algorithm compares prices across stores and factors in travel costs and time.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">3</div>
-                <h3>Get Recommendations</h3>
-                <p>See honest recommendations with clear verdicts: Worth it, Maybe, or Not worth switching.</p>
-            </div>
-            <div class="step">
-                <div class="step-number">4</div>
-                <h3>Save Money!</h3>
-                <p>Follow our recommendations and save hundreds of naira on every shopping trip.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="testimonials">
-        <h2>What Students Say</h2>
-        <div class="testimonial-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"This app saved me over ₦2,000 last month! The smart comparison feature is brilliant - it actually tells me when NOT to travel to another store."</p>
-                <div class="testimonial-author">Chioma A.</div>
-                <div class="testimonial-role">400 Level, Engineering</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"Finally, someone made an app that understands we don't just want cheap prices - we want value for our time and effort. Love it!"</p>
-                <div class="testimonial-author">Tunde O.</div>
-                <div class="testimonial-role">300 Level, Medicine</div>
-            </div>
-            <div class="testimonial-card">
-                <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-                <p class="testimonial-text">"The price alerts are amazing. I get notified when my favorite items drop in price nearby. No more walking around to check prices!"</p>
-                <div class="testimonial-author">Fatima B.</div>
-                <div class="testimonial-role">200 Level, Law</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section class="final-cta">
-        <h2>Ready to Save Smarter?</h2>
-        <p>Join hundreds of UNILAG students who are already saving money every week</p>
-        <button class="btn-hero btn-primary" onclick="openSignupModal()">Create Free Account</button>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="#features">Features</a>
-            <a href="#demo">Demo</a>
-            <a href="login.html">Login</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
-        </div>
-        <p>&copy; 2025 UNILAG Price Saver. Made with ❤️ for UNILAG Students</p>
-    </footer>
-
-    <!-- Sign-up Modal -->
-    <div class="modal" id="signupModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeSignupModal()">×</button>
-            <h2>🎉 Create Your Account</h2>
-            <p style="color: #666; margin-bottom: 1.5rem;">Start saving money with smart shopping recommendations</p>
-            
-            <form id="signupForm" onsubmit="handleSignup(event)">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="signupUsername" required placeholder="Choose a username">
-                </div>
-                <div class="form-group">
-                    <label>Email (Optional)</label>
-                    <input type="email" id="signupEmail" placeholder="your.email@unilag.edu.ng">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="signupPassword" required placeholder="Create a password" minlength="4">
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" id="signupPasswordConfirm" required placeholder="Confirm password">
-                </div>
-                <button type="submit" class="btn-submit">Create Account</button>
-            </form>
-
-            <div class="modal-footer">
-                Already have an account? <a href="login.html">Log in</a>
-            </div>
-        </div>
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="logo">
+      🛒 UNILAG Price Saver
     </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#demo">Live Demo</a>
+      <a href="#features">Features</a>
+      <a href="#stats">Statistics</a>
+      <a href="/login.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
 
-    <script>
-        const API_URL = 'http://localhost:8000/api';
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Smart Shopping for UNILAG Students 🎓</h1>
+      <p>Compare prices, save money, and find the best deals on campus - all in one place</p>
+      <div class="hero-buttons">
+        <a href="/login.html?tab=register" class="btn btn-primary">Get Started Free</a>
+        <a href="#demo" class="btn btn-outline">Try Live Demo</a>
+      </div>
+    </div>
+  </section>
 
-        function openSignupModal() {
-            document.getElementById('signupModal').classList.add('open');
+  <!-- Live Demo Section -->
+  <section class="demo-section" id="demo">
+    <h2 class="section-title">Try It Live - No Sign Up Required! 🚀</h2>
+    <p class="section-subtitle">Explore our powerful features with real-time data</p>
+
+    <div class="demo-container">
+      <div class="demo-tabs">
+        <button class="demo-tab active" data-tab="prices">💰 Price Comparison</button>
+        <button class="demo-tab" data-tab="search">🔍 Smart Search</button>
+        <button class="demo-tab" data-tab="analytics">📊 Analytics</button>
+        <button class="demo-tab" data-tab="alerts">🔔 Price Alerts</button>
+      </div>
+
+      <!-- Price Comparison Demo -->
+      <div class="demo-content active" id="prices">
+        <div id="pricesDisplay">
+          <div class="loading"></div> Loading real prices...
+        </div>
+      </div>
+
+      <!-- Search Demo -->
+      <div class="demo-content" id="search">
+        <input type="text" id="searchInput" placeholder="🔍 Search for items, retailers, or locations..." style="width: 100%; padding: 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem; margin-bottom: 1rem;">
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- Analytics Demo -->
+      <div class="demo-content" id="analytics">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <div style="background: white; padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary);" id="totalItems">-</div>
+            <div style="color: #666;">Total Items</div>
+          </div>
+          <div style="background: white; padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--success);" id="avgPrice">-</div>
+            <div style="color: #666;">Avg Price</div>
+          </div>
+          <div style="background: white; padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
+            <div style="font-size: 2.5rem; font-weight: bold; color: var(--secondary);" id="retailers">-</div>
+            <div style="color: #666;">Retailers</div>
+          </div>
+        </div>
+        <div id="categoryBreakdown"></div>
+      </div>
+
+      <!-- Alerts Demo -->
+      <div class="demo-content" id="alerts">
+        <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
+          <h3 style="margin-bottom: 1rem;">Set Custom Price Alerts</h3>
+          <p style="color: #666; margin-bottom: 1.5rem;">Get notified when prices drop below your target. Never miss a deal!</p>
+          <input type="text" placeholder="Item name (e.g., Rice)" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 8px; margin-bottom: 0.8rem;">
+          <input type="number" placeholder="Target price (₦)" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
+          <button class="btn btn-primary" onclick="alert('Sign up to start using price alerts!')">Create Alert</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" id="features">
+    <h2 class="section-title">Powerful Features 💪</h2>
+    <p class="section-subtitle">Everything you need for smart campus shopping</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Price Comparison</h3>
+        <p>Compare prices across multiple retailers instantly. Find the best deals without visiting every shop.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3>Location-Based Search</h3>
+        <p>Find the nearest stores with the best prices using our integrated Google Maps feature.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Price Alerts</h3>
+        <p>Set custom alerts and get notified when prices drop below your target. Never miss a deal!</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Real-Time Analytics</h3>
+        <p>Track price trends, analyze spending patterns, and make informed shopping decisions.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Smart Filtering</h3>
+        <p>Filter by category, price range, location, and retailer to find exactly what you need.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h3>Community Driven</h3>
+        <p>Contribute prices, earn reputation points, and help fellow students save money.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section" id="stats">
+    <h2 class="section-title" style="color: white;">Making an Impact 🎯</h2>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <h2 id="stat1">0</h2>
+        <p>Active Users</p>
+      </div>
+      <div class="stat-item">
+        <h2 id="stat2">0</h2>
+        <p>Price Comparisons</p>
+      </div>
+      <div class="stat-item">
+        <h2 id="stat3">0</h2>
+        <p>Retailers Tracked</p>
+      </div>
+      <div class="stat-item">
+        <h2 id="stat4">0</h2>
+        <p>Money Saved (₦)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Start Saving? 💸</h2>
+      <p>Join thousands of UNILAG students who are already saving money with smart shopping</p>
+      <a href="/login.html?tab=register" class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;">Get Started Free →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#demo">Demo</a>
+        <a href="#features">Features</a>
+        <a href="#stats">Statistics</a>
+        <a href="/login.html">Login</a>
+      </div>
+      <p>© 2025 UNILAG Price Saver. Built with ❤️ for UNILAG Students</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+
+    mobileMenuBtn?.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Demo tabs
+    const demoTabs = document.querySelectorAll('.demo-tab');
+    const demoContents = document.querySelectorAll('.demo-content');
+
+    demoTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetId = tab.dataset.tab;
+        
+        demoTabs.forEach(t => t.classList.remove('active'));
+        demoContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+
+    // Load real prices from API
+    async function loadPrices() {
+      try {
+        const API_URL = window.location.origin.includes('localhost') 
+          ? 'http://localhost:8000/api' 
+          : `${window.location.origin}/api`;
+        
+        const response = await fetch(`${API_URL}/items/prices/all`);
+        const prices = await response.json();
+        
+        const pricesDisplay = document.getElementById('pricesDisplay');
+        
+        if (prices && prices.length > 0) {
+          // Get categories
+          const categoriesResponse = await fetch(`${API_URL}/items/categories/all`);
+          const categories = await categoriesResponse.json();
+          
+          // Show first 6 prices
+          const displayPrices = prices.slice(0, 6);
+          
+          pricesDisplay.innerHTML = displayPrices.map(price => {
+            const category = categories.find(c => c.id === price.category_id);
+            return `
+              <div class="price-card">
+                <div class="price-card-header">
+                  <div>
+                    <h3>${price.name}</h3>
+                    <span class="category-tag">${category ? category.icon + ' ' + category.name : 'Unknown'}</span>
+                  </div>
+                  <div class="price-value">₦${price.price.toFixed(2)}</div>
+                </div>
+                <div class="price-details">
+                  <div class="price-detail">
+                    <span class="price-detail-label">Brand</span>
+                    <span class="price-detail-value">${price.brand || 'N/A'}</span>
+                  </div>
+                  <div class="price-detail">
+                    <span class="price-detail-label">Retailer</span>
+                    <span class="price-detail-value">${price.retailer || 'N/A'}</span>
+                  </div>
+                  <div class="price-detail">
+                    <span class="price-detail-label">Location</span>
+                    <span class="price-detail-value">${price.location || 'N/A'}</span>
+                  </div>
+                  ${price.pack_size ? `
+                  <div class="price-detail">
+                    <span class="price-detail-label">Pack Size</span>
+                    <span class="price-detail-value">${price.pack_size}${price.pack_unit || ''}</span>
+                  </div>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Update analytics
+          document.getElementById('totalItems').textContent = prices.length;
+          const avgPrice = prices.reduce((sum, p) => sum + p.price, 0) / prices.length;
+          document.getElementById('avgPrice').textContent = '₦' + avgPrice.toFixed(0);
+          const uniqueRetailers = new Set(prices.map(p => p.retailer).filter(Boolean));
+          document.getElementById('retailers').textContent = uniqueRetailers.size;
+
+          // Category breakdown
+          const categoryStats = {};
+          prices.forEach(price => {
+            const cat = categories.find(c => c.id === price.category_id);
+            const catName = cat ? cat.name : 'Unknown';
+            categoryStats[catName] = (categoryStats[catName] || 0) + 1;
+          });
+
+          const categoryBreakdown = document.getElementById('categoryBreakdown');
+          categoryBreakdown.innerHTML = '<h3 style="margin-bottom: 1rem;">Category Breakdown</h3>' +
+            Object.entries(categoryStats).map(([cat, count]) => `
+              <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 600;">${cat}</span>
+                <span style="background: var(--primary); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">${count} items</span>
+              </div>
+            `).join('');
+
+        } else {
+          pricesDisplay.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No prices available yet. Be the first to contribute!</p>';
         }
+      } catch (error) {
+        console.error('Error loading prices:', error);
+        document.getElementById('pricesDisplay').innerHTML = 
+          '<p style="text-align: center; color: #666; padding: 2rem;">Unable to load prices. Please try again later.</p>';
+      }
+    }
 
-        function closeSignupModal() {
-            document.getElementById('signupModal').classList.remove('open');
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    let allPrices = [];
+    let searchTimeout;
+
+    async function initSearch() {
+      try {
+        const API_URL = window.location.origin.includes('localhost') 
+          ? 'http://localhost:8000/api' 
+          : `${window.location.origin}/api`;
+        
+        const response = await fetch(`${API_URL}/items/prices/all`);
+        allPrices = await response.json();
+      } catch (error) {
+        console.error('Error loading prices for search:', error);
+      }
+    }
+
+    searchInput?.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      const query = e.target.value.trim().toLowerCase();
+
+      if (!query) {
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      searchTimeout = setTimeout(() => {
+        const filtered = allPrices.filter(p =>
+          p.name?.toLowerCase().includes(query) ||
+          p.retailer?.toLowerCase().includes(query) ||
+          p.location?.toLowerCase().includes(query) ||
+          p.brand?.toLowerCase().includes(query)
+        ).slice(0, 5);
+
+        if (filtered.length > 0) {
+          searchResults.innerHTML = filtered.map(p => `
+            <div class="price-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h3 style="margin-bottom: 0.3rem;">${p.name}</h3>
+                  <p style="color: #666; font-size: 0.9rem;">${p.retailer || 'Unknown'} • ${p.location || 'Unknown'}</p>
+                </div>
+                <div class="price-value">₦${p.price.toFixed(2)}</div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          searchResults.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No results found</p>';
         }
+      }, 300);
+    });
 
-        // Close modal when clicking outside
-        document.getElementById('signupModal').addEventListener('click', (e) => {
-            if (e.target.id === 'signupModal') {
-                closeSignupModal();
-            }
-        });
+    // Animate stats counter
+    function animateCounter(id, target, duration = 2000) {
+      const element = document.getElementById(id);
+      const start = 0;
+      const increment = target / (duration / 16);
+      let current = start;
 
-        async function handleSignup(e) {
-            e.preventDefault();
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          element.textContent = Math.round(target).toLocaleString();
+          clearInterval(timer);
+        } else {
+          element.textContent = Math.round(current).toLocaleString();
+        }
+      }, 16);
+    }
 
-            const username = document.getElementById('signupUsername').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('signupPasswordConfirm').value;
+    // Intersection Observer for stats animation
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter('stat1', 500);
+          animateCounter('stat2', 10000);
+          animateCounter('stat3', 50);
+          animateCounter('stat4', 250000);
+          statsObserver.unobserve(entry.target);
+        }
+      });
+    });
 
-            // Validation
-            if (password !== confirmPassword) {
-                alert('❌ Passwords do not match');
-                return;
-            }
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+      statsObserver.observe(statsSection);
+    }
 
-            if (password.length < 4) {
-                alert('❌ Password must be at least 4 characters');
-                return;
-            }
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPrices();
+      initSearch();
+    });
 
-            try {
-                const response = await fetch(`${API_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, email })
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.detail || 'Registration failed');
-                }
-
-                const data = await response.json();
-
-                // Save session
-                localStorage.setItem('userId', data.user_id);
-                localStorage.setItem('userName', data.user_name);
-                localStorage.setItem('userRole', data.user_role);
-                localStorage.setItem('loginToken', data.login_token);
-
-                // Redirect to dashboard
-                alert('✅ Account created successfully! Welcome to UNILAG Price Saver!');
-                window.location.href = "/userdashboard.html";
-                
-    </script>
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          navLinks.classList.remove('active');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

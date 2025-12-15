@@ -3,46 +3,411 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>UNILAG Price Saver - Login</title>
-  <link rel="stylesheet" href="/static/css/login.css">
+  <title>UNILAG Price Saver - Join Now</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5568d3;
+      --success: #34C759;
+      --danger: #FF3B30;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-gradient);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .login-container {
+      background:white;
+      border-radius:24px;
+      box-shadow:0 20px 60px rgba(0,0,0,.3);
+      overflow:hidden;
+      max-width:1100px;
+      width:100%;
+      display:grid;
+      grid-template-columns:1.2fr 1fr;
+      min-height:640px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Branding Side */
+    .login-branding {
+      background: var(--bg-gradient);
+      color:white;
+      padding:3rem;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-branding::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .branding-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-branding-icon {
+      font-size:4rem;
+      margin-bottom:1.5rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .login-branding h1 {
+      font-size:2.2rem;
+      margin-bottom:1rem;
+      font-weight:800;
+    }
+
+    .login-branding p {
+      font-size:1.1rem;
+      opacity:.95;
+      line-height:1.6;
+      margin-bottom:2rem;
+    }
+
+    .features {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .feature-item {
+      display:flex;
+      align-items:center;
+      gap:1rem;
+      font-size:1rem;
+      padding: 0.8rem;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      animation: slideIn 0.6s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .feature-item::before {
+      content: "✓";
+      font-weight:bold;
+      font-size:1.5rem;
+      background: white;
+      color: var(--primary);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    /* Form Side */
+    .login-form-section {
+      padding:3rem 2.5rem;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .form-tabs {
+      display:flex;
+      gap:1rem;
+      margin-bottom:2rem;
+      border-bottom:2px solid #eee;
+    }
+
+    .form-tab {
+      padding:1rem 1.5rem;
+      text-align:center;
+      cursor:pointer;
+      border:none;
+      background:none;
+      font-size:1rem;
+      font-weight:600;
+      color:#999;
+      transition:all .3s;
+      border-bottom:3px solid transparent;
+      margin-bottom:-2px;
+      flex: 1;
+    }
+
+    .form-tab.active {
+      color:var(--primary);
+      border-bottom-color:var(--primary);
+    }
+
+    .form-tab:hover {
+      color:var(--primary);
+    }
+
+    .form-content {
+      display:none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .form-content.active {
+      display:block;
+    }
+
+    .section-title {
+      margin-bottom:1.5rem;
+      color:#333;
+      font-size:1.8rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom:1.5rem;
+    }
+
+    label {
+      display:block;
+      margin-bottom:0.6rem;
+      font-weight:600;
+      color:#333;
+      font-size:0.95rem;
+    }
+
+    input, select {
+      width:100%;
+      padding:1rem;
+      border:2px solid #eee;
+      border-radius:10px;
+      font-size:1rem;
+      font-family:inherit;
+      transition:border .3s;
+    }
+
+    input:focus, select:focus {
+      outline:none;
+      border-color:var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .password-info {
+      background:#f0f4ff;
+      padding:1rem;
+      border-radius:10px;
+      margin-bottom:1.5rem;
+      font-size:0.9rem;
+      color:var(--primary);
+      border-left:4px solid var(--primary);
+    }
+
+    .login-btn {
+      width:100%;
+      padding:1rem;
+      background:var(--bg-gradient);
+      color:white;
+      border:none;
+      border-radius:10px;
+      font-size:1.05rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .3s;
+      margin-top:1rem;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform:translateY(-2px);
+      box-shadow:0 10px 25px rgba(102,126,234,.4);
+    }
+
+    .login-btn:active {
+      transform:translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity:.7;
+      cursor:not-allowed;
+    }
+
+    .login-btn.alt {
+      background:#34C759;
+      margin-top:1rem;
+    }
+
+    .login-btn.neutral {
+      background:#888;
+    }
+
+    .status-message {
+      padding:1rem;
+      border-radius:10px;
+      margin-bottom:1.5rem;
+      font-size:0.95rem;
+      display:none;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-message.success {
+      background:#d4edda;
+      color:#155724;
+      border:1px solid #c3e6cb;
+      display:block;
+    }
+
+    .status-message.error {
+      background:#f8d7da;
+      color:#721c24;
+      border:1px solid #f5c6cb;
+      display:block;
+    }
+
+    .center-note {
+      text-align:center;
+      margin-top:1.5rem;
+    }
+
+    .small-note {
+      font-size:0.95rem;
+      color:#666;
+      margin-bottom:0.8rem;
+    }
+
+    .spinner {
+      display:inline-block;
+      width:14px;
+      height:14px;
+      border:2px solid rgba(255,255,255,.3);
+      border-top:2px solid white;
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+      margin-right:8px;
+    }
+
+    @keyframes spin {
+      to{ transform:rotate(360deg); }
+    }
+
+    /* Error validation */
+    input.error {
+      border-color: var(--danger);
+    }
+
+    .error-message {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Responsive */
+    @media (max-width:1024px) {
+      .login-container {
+        grid-template-columns:1fr;
+        max-width:600px;
+      }
+      
+      .login-branding {
+        border-radius:24px 24px 0 0;
+        padding: 2rem;
+      }
+    }
+
+    @media (max-width:768px) {
+      .login-container {
+        min-height:unset;
+      }
+      
+      .login-branding {
+        padding:2rem 1.5rem;
+      }
+      
+      .login-form-section {
+        padding:2rem 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
-    <!-- Left Side - Branding -->
+    <!-- Branding -->
     <div class="login-branding">
-      <div class="login-branding-icon">🛍️</div>
-      <h1>UNILAG Price Saver</h1>
-      <p>Smart price comparison and item tracking for UNILAG campus</p>
+      <div class="branding-content">
+        <div class="login-branding-icon">🛍️</div>
+        <h1>UNILAG Price Saver</h1>
+        <p>Smart price comparison and shopping recommendations for UNILAG students</p>
 
-      <div class="features">
-        <div class="feature-item">Find lowest prices</div>
-        <div class="feature-item">Real-time updates</div>
-        <div class="feature-item">Location-based search</div>
-        <div class="feature-item">Admin management</div>
+        <div class="features">
+          <div class="feature-item">Find lowest prices across campus</div>
+          <div class="feature-item">Smart shopping recommendations</div>
+          <div class="feature-item">Real-time price updates</div>
+          <div class="feature-item">Save money on every trip</div>
+        </div>
       </div>
     </div>
 
-    <!-- Right Side - Form -->
+    <!-- Form Section -->
     <div class="login-form-section">
       <!-- Tabs -->
       <div class="form-tabs" role="tablist">
-        <button class="form-tab active" data-mode="user" type="button">👤 User</button>
+        <button class="form-tab" data-mode="user" type="button">👤 User</button>
+        <button class="form-tab active" data-mode="register" type="button">🚀 Sign Up</button>
         <button class="form-tab" data-mode="admin" type="button">👨‍💼 Admin</button>
       </div>
 
       <!-- User Login -->
-      <div id="userLogin" class="form-content active" data-content="user">
-        <h2 class="section-title">User Login</h2>
+      <div id="userLogin" class="form-content" data-content="user">
+        <h2 class="section-title">Welcome Back!</h2>
         <div id="userStatus" class="status-message" aria-live="polite"></div>
 
         <div class="form-group">
           <label for="userUsername">Username</label>
           <input type="text" id="userUsername" placeholder="Enter your username" autocomplete="username">
+          <div class="error-message" id="userUsernameError"></div>
         </div>
 
         <div class="form-group">
           <label for="userPassword">Password</label>
           <input type="password" id="userPassword" placeholder="Enter your password" autocomplete="current-password">
+          <div class="error-message" id="userPasswordError"></div>
         </div>
 
         <button id="userLoginBtn" class="login-btn" type="button">
@@ -51,57 +416,62 @@
 
         <div class="center-note">
           <p class="small-note">Don't have an account?</p>
-          <button id="toRegisterBtn" class="login-btn alt" type="button">Create Account</button>
+          <button id="toRegisterBtn" class="login-btn alt" type="button">Create Free Account</button>
         </div>
       </div>
 
       <!-- User Registration -->
-      <div id="userRegister" class="form-content" data-content="register">
-        <h2 class="section-title">Create Account</h2>
+      <div id="userRegister" class="form-content active" data-content="register">
+        <h2 class="section-title">Join UNILAG Price Saver</h2>
         <div id="registerStatus" class="status-message" aria-live="polite"></div>
 
         <div class="form-group">
           <label for="regUsername">Username</label>
           <input type="text" id="regUsername" placeholder="Choose a username" autocomplete="username">
+          <div class="error-message" id="regUsernameError"></div>
         </div>
 
         <div class="form-group">
           <label for="regPassword">Password</label>
-          <input type="password" id="regPassword" placeholder="Create a password" autocomplete="new-password">
+          <input type="password" id="regPassword" placeholder="Create a password (min 4 characters)" autocomplete="new-password">
+          <div class="error-message" id="regPasswordError"></div>
         </div>
 
         <div class="form-group">
           <label for="regPasswordConfirm">Confirm Password</label>
-          <input type="password" id="regPasswordConfirm" placeholder="Confirm password" autocomplete="new-password">
+          <input type="password" id="regPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password">
+          <div class="error-message" id="regPasswordConfirmError"></div>
         </div>
 
         <button id="registerBtn" class="login-btn" type="button">
-          <span id="registerText">Create Account</span>
+          <span id="registerText">Create Free Account</span>
         </button>
 
         <div class="center-note">
           <p class="small-note">Already have an account?</p>
-          <button id="toLoginBtn" class="login-btn alt neutral" type="button">Back to Login</button>
+          <button id="toLoginBtn" class="login-btn neutral" type="button">Back to Login</button>
         </div>
       </div>
 
       <!-- Admin Login -->
       <div id="adminLogin" class="form-content" data-content="admin">
-        <h2 class="section-title">Admin Login</h2>
+        <h2 class="section-title">Admin Access</h2>
         <div id="adminStatus" class="status-message" aria-live="polite"></div>
 
         <div class="password-info">
-          🔐 Admin requires a special API key as password
+          🔐 Admin access requires special authentication
         </div>
 
         <div class="form-group">
           <label for="adminUsername">Admin Username</label>
           <input type="text" id="adminUsername" placeholder="Enter admin username" autocomplete="username">
+          <div class="error-message" id="adminUsernameError"></div>
         </div>
 
         <div class="form-group">
-          <label for="adminKey">Admin API Key (Password)</label>
+          <label for="adminKey">Admin API Key</label>
           <input type="password" id="adminKey" placeholder="Enter your admin API key" autocomplete="current-password">
+          <div class="error-message" id="adminKeyError"></div>
         </div>
 
         <button id="adminLoginBtn" class="login-btn" type="button">
@@ -111,7 +481,263 @@
     </div>
   </div>
 
-  <!-- Main module that imports others -->
-  <script type="module" src="/static/js/main.js"></script>
+  <script type="module">
+    const API_URL = (() => {
+      const hostname = window.location.hostname;
+      const origin = window.location.origin;
+      
+      if (hostname.includes('vercel.app') || hostname.includes('vercel.com')) {
+        return `${origin}/api`;
+      }
+      
+      if (hostname.includes('render.com') || hostname.includes('onrender.com')) {
+        return `${origin}/api`;
+      }
+      
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        const port = window.location.port;
+        if (port === '8000' || !port) {
+          return `${origin}/api`;
+        }
+        return 'http://localhost:8000/api';
+      }
+      
+      return `${origin}/api`;
+    })();
+
+    // Tab switching
+    function initTabs() {
+      const tabs = document.querySelectorAll('.form-tab');
+      const contents = document.querySelectorAll('.form-content');
+      
+      function activateMode(mode) {
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+        contents.forEach(c => {
+          const show = c.dataset.content === mode || (mode === 'user' && c.id === 'userLogin');
+          c.classList.toggle('active', show);
+        });
+      }
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => activateMode(tab.dataset.mode));
+      });
+      
+      document.getElementById('toRegisterBtn')?.addEventListener('click', () => activateMode('register'));
+      document.getElementById('toLoginBtn')?.addEventListener('click', () => activateMode('user'));
+    }
+
+    // Validation
+    function validateField(input, rules) {
+      const value = input.value.trim();
+      const errorEl = document.getElementById(`${input.id}Error`);
+      
+      input.classList.remove('error');
+      errorEl.classList.remove('show');
+      
+      if (rules.required && !value) {
+        input.classList.add('error');
+        errorEl.textContent = 'This field is required';
+        errorEl.classList.add('show');
+        return false;
+      }
+      
+      if (rules.minLength && value.length < rules.minLength) {
+        input.classList.add('error');
+        errorEl.textContent = `Minimum ${rules.minLength} characters required`;
+        errorEl.classList.add('show');
+        return false;
+      }
+      
+      return true;
+    }
+
+    function showStatus(el, type, message) {
+      if (!el) return;
+      el.className = `status-message ${type}`;
+      el.textContent = message;
+    }
+
+    function disableButton(btn, disabled, text) {
+      if (!btn) return;
+      btn.disabled = disabled;
+      const span = btn.querySelector('span');
+      if (text && span) span.innerHTML = text;
+    }
+
+    // User Registration
+    async function registerUser() {
+      const username = document.getElementById('regUsername');
+      const password = document.getElementById('regPassword');
+      const passwordConfirm = document.getElementById('regPasswordConfirm');
+      const statusEl = document.getElementById('registerStatus');
+      const btn = document.getElementById('registerBtn');
+
+      // Validate
+      const isValid = [
+        validateField(username, { required: true }),
+        validateField(password, { required: true, minLength: 4 }),
+        validateField(passwordConfirm, { required: true })
+      ].every(v => v);
+
+      if (!isValid) return;
+
+      if (password.value !== passwordConfirm.value) {
+        showStatus(statusEl, 'error', '❌ Passwords do not match');
+        passwordConfirm.classList.add('error');
+        return;
+      }
+
+      disableButton(btn, true, '<span class="spinner"></span>Creating account...');
+
+      try {
+        const res = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.value.trim(),
+            password: password.value
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Registration failed');
+        }
+
+        showStatus(statusEl, 'success', '✅ Account created! Redirecting...');
+        
+        localStorage.setItem('userId', data.user_id);
+        localStorage.setItem('userName', data.user_name);
+        localStorage.setItem('userRole', data.user_role);
+        localStorage.setItem('loginToken', data.access_token);
+
+        setTimeout(() => {
+          window.location.href = '/user-dashboard.html';
+        }, 800);
+      } catch (err) {
+        showStatus(statusEl, 'error', `❌ ${err.message}`);
+      } finally {
+        disableButton(btn, false, 'Create Free Account');
+      }
+    }
+
+    // User Login
+    async function loginUser() {
+      const username = document.getElementById('userUsername');
+      const password = document.getElementById('userPassword');
+      const statusEl = document.getElementById('userStatus');
+      const btn = document.getElementById('userLoginBtn');
+
+      const isValid = [
+        validateField(username, { required: true }),
+        validateField(password, { required: true })
+      ].every(v => v);
+
+      if (!isValid) return;
+
+      disableButton(btn, true, '<span class="spinner"></span>Logging in...');
+
+      try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.value.trim(),
+            password: password.value
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Login failed');
+        }
+
+        showStatus(statusEl, 'success', '✅ Login successful! Redirecting...');
+        
+        localStorage.setItem('userId', data.user_id);
+        localStorage.setItem('userName', data.user_name);
+        localStorage.setItem('userRole', data.user_role);
+        localStorage.setItem('loginToken', data.access_token);
+
+        setTimeout(() => {
+          window.location.href = '/user-dashboard.html';
+        }, 800);
+      } catch (err) {
+        showStatus(statusEl, 'error', `❌ ${err.message}`);
+      } finally {
+        disableButton(btn, false, 'Login');
+      }
+    }
+
+    // Admin Login
+    async function loginAdmin() {
+      const username = document.getElementById('adminUsername');
+      const apiKey = document.getElementById('adminKey');
+      const statusEl = document.getElementById('adminStatus');
+      const btn = document.getElementById('adminLoginBtn');
+
+      const isValid = [
+        validateField(username, { required: true }),
+        validateField(apiKey, { required: true })
+      ].every(v => v);
+
+      if (!isValid) return;
+
+      disableButton(btn, true, '<span class="spinner"></span>Verifying...');
+
+      try {
+        const res = await fetch(`${API_URL}/auth/admin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username.value.trim(),
+            admin_key: apiKey.value.trim()
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Admin login failed');
+        }
+
+        showStatus(statusEl, 'success', '✅ Admin login successful! Redirecting...');
+        
+        localStorage.setItem('userId', data.admin_id);
+        localStorage.setItem('userName', data.admin_name);
+        localStorage.setItem('userRole', 'admin');
+        localStorage.setItem('loginToken', data.access_token);
+
+        setTimeout(() => {
+          window.location.href = '/admin-dashboard.html';
+        }, 800);
+      } catch (err) {
+        showStatus(statusEl, 'error', `❌ ${err.message}`);
+      } finally {
+        disableButton(btn, false, 'Login as Admin');
+      }
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      initTabs();
+      
+      document.getElementById('registerBtn')?.addEventListener('click', registerUser);
+      document.getElementById('userLoginBtn')?.addEventListener('click', loginUser);
+      document.getElementById('adminLoginBtn')?.addEventListener('click', loginAdmin);
+
+      // Enter key support
+      document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const active = document.querySelector('.form-content.active');
+          if (active?.id === 'userLogin') loginUser();
+          else if (active?.id === 'userRegister') registerUser();
+          else if (active?.id === 'adminLogin') loginAdmin();
+        }
+      });
+    });
+  </script>
 </body>
 </html>

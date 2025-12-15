@@ -1,6 +1,7 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from urllib.parse import quote_plus
 from dotenv import load_dotenv
 
 # ------------------------------
@@ -46,4 +47,7 @@ Base = declarative_base()
 # ------------------------------
 def init_db():
     """Create all tables in the database."""
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print("⚠️ DB init failed:", e)

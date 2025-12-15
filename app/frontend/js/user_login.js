@@ -25,18 +25,38 @@ export function initUserLogin() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.detail || 'Invalid credentials');
-
+    
+        const text = await resp.text();
+        let data;
+    
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error(text || 'Server error');
+        }
+    
+        if (!resp.ok) {
+          throw new Error(data.detail || 'Invalid credentials');
+        }
+    
         showStatus(statusEl, 'success', '✅ Login successful! Redirecting...');
-        saveSession({ id: data.user_id, username: data.user_name, role: data.user_role, token: data.login_token });
-        setTimeout(() => { window.location.href = appPath('user-dashboard.html'); }, 800);
+        saveSession({
+          id: data.user_id,
+          username: data.user_name,
+          role: data.user_role,
+          token: data.login_token
+        });
+    
+        setTimeout(() => {
+          window.location.href = appPath('user-dashboard.html');
+        }, 800);
+    
       } catch (err) {
         showStatus(statusEl, 'error', `❌ ${err.message}`);
       } finally {
         disableButton(loginBtn, false, 'Login');
       }
-    })();
+    })();    
   }
 
   if (loginBtn) loginBtn.addEventListener('click', loginUser);

@@ -9,7 +9,28 @@ from typing import Optional
 import os
 import json
 from dotenv import load_dotenv
+
+# --- Workaround / monkeypatch for passlib <-> bcrypt version mismatch ---
+# If your environment installs bcrypt>=4.x, passlib may try to read bcrypt.__about__.__version__
+# which doesn't exist in some bcrypt releases. This small shim avoids that crash.
+try:
+    import bcrypt as _bcrypt
+    if not hasattr(_bcrypt, "__about__"):
+        class _About:
+            pass
+        _about = _About()
+        # bcrypt might expose __version__; if not, fallback to a sensible default string
+        _about.__version__ = getattr(_bcrypt, "__version__", "3.2.2")
+        _bcrypt.__about__ = _about
+except Exception:
+    # If bcrypt import fails here, passlib will still error later; we'll still surface a clear error.
+    pass
+
+# Now import passlib after the monkeypatch
 from passlib.context import CryptContext
+
+# You may choose a JWT library explicitly; this code assumes 'pyjwt' or 'python-jose' interface.
+# If you're using python-jose DO: from jose import jwt, JWTError, ExpiredSignatureError
 import jwt
 
 load_dotenv()
@@ -17,6 +38,7 @@ load_dotenv()
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
 # Security Configuration
+# Keep bcrypt as scheme; we'll pre-hash with sha256 to avoid 72-byte limit.
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
@@ -41,25 +63,68 @@ def get_db():
         db.close()
 
 
+# -------------------------------
+# Password helpers (fixed)
+# -------------------------------
+import hashlib
+
+def _prehash_password_bytes(password: str) -> bytes:
+    """
+    Convert the incoming password string into a fixed-length binary digest (SHA-256).
+    This removes bcrypt's 72-byte limit and is safe when combined with bcrypt.
+    """
+    if isinstance(password, str):
+        password = password.encode("utf-8")
+    # returns raw 32-byte digest
+    return hashlib.sha256(password).digest()
+
+
 def hash_password(password: str) -> str:
-    """Hash password using bcrypt"""
-    return pwd_context.hash(password)
+    """
+    Hash password using: bcrypt( SHA256(password) )
+    Returns the passlib-managed bcrypt hash (string).
+    """
+    digest = _prehash_password_bytes(password)
+    # passlib will accept bytes for hashing
+    return pwd_context.hash(digest)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify password against bcrypt hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    """
+    Verify the provided plain password against the stored hash.
+    Strategy:
+      1. Try new scheme: bcrypt( sha256(plain_password) )
+      2. Fallback: bcrypt(plain_password)  <-- handles existing users that used old scheme
+    """
+    digest = _prehash_password_bytes(plain_password)
+
+    # 1) Try new pre-hash verify first
+    try:
+        if pwd_context.verify(digest, hashed_password):
+            return True
+    except Exception:
+        # ignore and try fallback
+        pass
+
+    # 2) Fallback: older users who may have had their plain password string passed to bcrypt
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception:
+        return False
 
 
+# -------------------------------
+# JWT helpers (unchanged, but keep an eye on library)
+# -------------------------------
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Create JWT access token"""
     to_encode = data.copy()
-    
+
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -75,7 +140,8 @@ def decode_access_token(token: str) -> dict:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has expired"
         )
-    except jwt.JWTError:
+    except Exception:
+        # Broad catch here; adjust if you use a specific JWT lib with specific exception classes
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
@@ -89,21 +155,21 @@ async def get_current_user(
     """Get current user from JWT token"""
     token = credentials.credentials
     payload = decode_access_token(token)
-    
+
     user_id = payload.get("sub")
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials"
         )
-    
+
     user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found"
         )
-    
+
     return user
 
 
@@ -150,7 +216,7 @@ class LoginResponse(BaseModel):
 @router.post("/register", response_model=LoginResponse)
 async def register_user(request: UserRegisterRequest, db: Session = Depends(get_db)):
     """Register new user with bcrypt password hashing"""
-    
+
     # Validation
     if not request.username or not request.password:
         raise HTTPException(
@@ -172,7 +238,7 @@ async def register_user(request: UserRegisterRequest, db: Session = Depends(get_
             detail="Username already exists"
         )
 
-    # Create user with bcrypt hashed password
+    # Create user with bcrypt hashed password (we pre-hash inside hash_password)
     password_hash = hash_password(request.password)
     new_user = User(
         username=request.username,
@@ -205,7 +271,7 @@ async def register_user(request: UserRegisterRequest, db: Session = Depends(get_
 @router.post("/login", response_model=LoginResponse)
 async def login_user(request: UserLoginRequest, db: Session = Depends(get_db)):
     """Login user with bcrypt password verification"""
-    
+
     if not request.username or not request.password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -220,12 +286,45 @@ async def login_user(request: UserLoginRequest, db: Session = Depends(get_db)):
             detail="Invalid username or password"
         )
 
-    # Verify password with bcrypt
-    if not verify_password(request.password, user.password_hash):
+    # Verify password with prioritized new scheme
+    # We will detect if fallback was used so we can re-hash the stored password
+    used_fallback = False
+    digest = _prehash_password_bytes(request.password)
+
+    try:
+        if pwd_context.verify(digest, user.password_hash):
+            verified = True
+        else:
+            # fallback
+            if pwd_context.verify(request.password, user.password_hash):
+                verified = True
+                used_fallback = True
+            else:
+                verified = False
+    except Exception:
+        # try fallback robustly
+        try:
+            verified = pwd_context.verify(request.password, user.password_hash)
+            if verified:
+                used_fallback = True
+        except Exception:
+            verified = False
+
+    if not verified:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password"
         )
+
+    # If the user was verified using the old scheme (fallback), upgrade their stored hash
+    if used_fallback:
+        try:
+            user.password_hash = hash_password(request.password)
+            db.add(user)
+            db.commit()
+        except Exception:
+            # do not fail login if re-hash/update fails; but log in real app
+            pass
 
     # Create access token
     access_token = create_access_token(
@@ -236,7 +335,7 @@ async def login_user(request: UserLoginRequest, db: Session = Depends(get_db)):
         success=True,
         user_id=user.id,
         user_name=user.username,
-        user_role="user",
+        user_role=user.role,
         access_token=access_token,
         token_type="bearer",
         message=f"Welcome back, {user.username}!"
@@ -246,7 +345,7 @@ async def login_user(request: UserLoginRequest, db: Session = Depends(get_db)):
 @router.post("/admin", response_model=LoginResponse)
 async def login_admin(request: AdminLoginRequest, db: Session = Depends(get_db)):
     """Admin login with API key verification"""
-    
+
     if not request.username or not request.admin_key:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -279,7 +378,7 @@ async def login_admin(request: AdminLoginRequest, db: Session = Depends(get_db))
         db.add(admin_user)
         db.commit()
         db.refresh(admin_user)
-    
+
     # Ensure user has admin role
     if admin_user.role != "admin":
         admin_user.role = "admin"
@@ -343,7 +442,7 @@ async def refresh_token(current_user: User = Depends(get_current_user)):
     new_token = create_access_token(
         data={"sub": str(current_user.id), "role": current_user.role}
     )
-    
+
     return {
         "access_token": new_token,
         "token_type": "bearer"

@@ -8,6 +8,7 @@ googlemaps==4.2.0
 requests==2.32.3
 Jinja2>=3.1.4
 python-multipart>=0.0.20
+bcrypt>=3.2.2
 passlib[bcrypt]==1.7.4
 PyJWT==2.8.0
 python-jose[cryptography]==3.3.0

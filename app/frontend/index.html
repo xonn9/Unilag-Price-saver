@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UNILAG Price Saver - Smart Campus Shopping</title>
+  <link rel="stylesheet" href="css/design-system.css" />
   <style>
     * {
       margin: 0;
@@ -12,145 +13,182 @@
     }
 
     :root {
-      --primary: #667eea;
-      --primary-dark: #5568d3;
-      --secondary: #764ba2;
-      --accent: #f093fb;
-      --success: #34C759;
-      --dark: #1a1a2e;
-      --light: #f8f9fa;
-      --text: #333;
-      --border: #e0e0e0;
+      --primary-dark: var(--color-primary-dark);
+      --primary: var(--color-primary);
+      --accent: var(--color-primary-light);
+      --secondary: var(--color-primary);
+      --success: var(--color-success);
+      --danger: var(--color-danger);
+      --light-bg: var(--color-bg-primary);
+      --slate: var(--color-text-secondary);
+      --border: var(--color-border);
+      --text-dark: var(--color-text-primary);
+      --shadow-lg: var(--shadow-lg);
+      --shadow-md: var(--shadow-md);
+      --gradient-hero: var(--gradient-primary);
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: var(--text);
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      color: var(--text-dark);
+      background: var(--light-bg);
       overflow-x: hidden;
-      background: var(--light);
     }
 
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
-      animation: float 20s linear infinite;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-100px); }
-    }
-
+    /* Navigation */
     nav {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(248, 250, 252, 0.95);
       backdrop-filter: blur(10px);
-      padding: 1rem 5%;
+      padding: 1.2rem 5%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-      transition: all 0.3s;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
     }
 
     nav.scrolled {
       padding: 0.8rem 5%;
-      background: rgba(255, 255, 255, 0.98);
+      background: rgba(248, 250, 252, 0.98);
+      box-shadow: var(--shadow-md);
     }
 
     .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.7rem;
+      letter-spacing: -0.5px;
     }
 
     .nav-links {
       display: flex;
-      gap: 2rem;
+      gap: 2.5rem;
       align-items: center;
     }
 
     .nav-links a {
-      color: var(--text);
+      color: var(--text-dark);
       text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+      position: relative;
     }
 
-    .nav-links a:hover {
-      color: var(--primary);
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
     }
 
     .btn {
       padding: 0.8rem 2rem;
-      border-radius: 50px;
+      border-radius: 10px;
       font-weight: 600;
       text-decoration: none;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
       border: none;
       cursor: pointer;
       display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.9rem;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: linear-gradient(135deg, var(--primary), var(--accent));
       color: white;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
     }
 
     .btn-outline {
-      border: 2px solid white;
-      color: white;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      background: transparent;
     }
 
     .btn-outline:hover {
-      background: white;
-      color: var(--primary);
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      background: var(--gradient-hero);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -30%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-30px); }
     }
 
     .hero-content {
       text-align: center;
       color: white;
       z-index: 1;
-      max-width: 800px;
+      max-width: 900px;
       padding: 2rem;
-      animation: fadeInUp 0.8s ease-out;
+      animation: slideUp 1s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes fadeInUp {
+    @keyframes slideUp {
       from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(40px);
       }
       to {
         opacity: 1;
@@ -159,168 +197,50 @@
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      margin-bottom: 1rem;
-      line-height: 1.2;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 1.5rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
     }
 
     .hero p {
-      font-size: clamp(1.1rem, 2vw, 1.3rem);
-      margin-bottom: 2rem;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      margin-bottom: 2.5rem;
       opacity: 0.95;
+      line-height: 1.8;
+      font-weight: 300;
     }
 
     .hero-buttons {
       display: flex;
-      gap: 1rem;
+      gap: 1.5rem;
       justify-content: center;
       flex-wrap: wrap;
     }
 
-    /* Live Demo Section */
-    .demo-section {
-      padding: 5rem 5%;
-      background: white;
+    /* Features Section */
+    .features {
+      padding: 6rem 5%;
+      background: var(--light-bg);
     }
 
     .section-title {
       text-align: center;
       font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      color: var(--primary-dark);
+      font-weight: 800;
     }
 
     .section-subtitle {
       text-align: center;
-      color: #666;
-      font-size: 1.2rem;
-      margin-bottom: 3rem;
-    }
-
-    .demo-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: var(--light);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    .demo-tabs {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
-      border-bottom: 2px solid var(--border);
-      overflow-x: auto;
-    }
-
-    .demo-tab {
-      padding: 1rem 2rem;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #666;
-      transition: all 0.3s;
-      white-space: nowrap;
-    }
-
-    .demo-tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .demo-content {
-      display: none;
-      animation: fadeIn 0.5s;
-    }
-
-    .demo-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .price-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border);
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-
-    .price-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
-    .price-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 1rem;
-    }
-
-    .price-card h3 {
-      font-size: 1.3rem;
-      color: var(--text);
-      margin-bottom: 0.3rem;
-    }
-
-    .category-tag {
-      display: inline-block;
-      padding: 0.3rem 0.8rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .price-value {
-      font-size: 2rem;
-      font-weight: bold;
-      color: var(--success);
-    }
-
-    .price-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .price-detail {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .price-detail-label {
-      font-size: 0.85rem;
-      color: #666;
-      margin-bottom: 0.3rem;
-    }
-
-    .price-detail-value {
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    /* Features Section */
-    .features-section {
-      padding: 5rem 5%;
-      background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+      font-size: 1.1rem;
+      color: var(--slate);
+      margin-bottom: 4rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .features-grid {
@@ -333,160 +253,150 @@
 
     .feature-card {
       background: white;
-      padding: 2rem;
-      border-radius: 15px;
-      text-align: center;
-      transition: all 0.3s;
-      border: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      border-top: 4px solid var(--primary);
+      cursor: pointer;
+      animation: cardFade 0.6s ease backwards;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+    .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes cardFade {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-top-color: var(--accent);
     }
 
     .feature-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      display: inline-block;
     }
 
     .feature-card h3 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       margin-bottom: 1rem;
-      color: var(--text);
+      color: var(--primary-dark);
+      font-weight: 700;
     }
 
     .feature-card p {
-      color: #666;
-      line-height: 1.6;
-    }
-
-    /* Stats Section */
-    .stats-section {
-      padding: 5rem 5%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .stat-item h2 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      animation: countUp 2s ease-out;
-    }
-
-    .stat-item p {
-      font-size: 1.1rem;
-      opacity: 0.9;
+      color: var(--slate);
+      line-height: 1.7;
+      font-size: 0.95rem;
     }
 
     /* CTA Section */
     .cta-section {
+      background: var(--gradient-hero);
       padding: 5rem 5%;
       text-align: center;
-      background: white;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: -50%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
     }
 
     .cta-content {
+      position: relative;
+      z-index: 1;
       max-width: 700px;
       margin: 0 auto;
     }
 
-    .cta-content h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 1rem;
-      color: var(--text);
+    .cta-section h2 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      margin-bottom: 1.5rem;
+      font-weight: 800;
     }
 
-    .cta-content p {
-      font-size: 1.2rem;
-      color: #666;
-      margin-bottom: 2rem;
+    .cta-section p {
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.95;
+      line-height: 1.8;
+    }
+
+    /* Stats Section */
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      padding: 3rem 5%;
+      max-width: 1000px;
+      margin: 0 auto;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.95rem;
+      color: var(--slate);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Footer */
     footer {
-      background: var(--dark);
+      background: var(--primary-dark);
       color: white;
       padding: 3rem 5%;
       text-align: center;
     }
 
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
+    footer p {
+      opacity: 0.8;
+      font-size: 0.95rem;
     }
 
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .footer-links a {
-      color: white;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-
-    .footer-links a:hover {
-      color: var(--accent);
-    }
-
-    /* Loading Animation */
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Mobile Menu */
-    .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text);
-    }
-
+    /* Responsive */
     @media (max-width: 768px) {
+      nav {
+        padding: 1rem 4%;
+      }
+
       .nav-links {
-        position: fixed;
-        top: 70px;
-        left: -100%;
-        width: 100%;
-        background: white;
-        flex-direction: column;
-        padding: 2rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        transition: left 0.3s;
-      }
-
-      .nav-links.active {
-        left: 0;
-      }
-
-      .mobile-menu-btn {
-        display: block;
+        gap: 1.5rem;
+        font-size: 0.9rem;
       }
 
       .hero-buttons {
@@ -499,12 +409,12 @@
         max-width: 300px;
       }
 
-      .demo-tabs {
-        flex-wrap: wrap;
-      }
-
       .features-grid {
         grid-template-columns: 1fr;
+      }
+
+      .stats {
+        flex-direction: column;
       }
     }
   </style>
@@ -512,406 +422,106 @@
 <body>
   <!-- Navigation -->
   <nav id="navbar">
-    <div class="logo">
-      🛒 UNILAG Price Saver
-    </div>
-    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-    <div class="nav-links" id="navLinks">
-      <a href="#demo">Live Demo</a>
+    <div class="logo">🛒 Price Saver</div>
+    <div class="nav-links">
       <a href="#features">Features</a>
-      <a href="#stats">Statistics</a>
-      <a href="/login.html" class="btn btn-primary">Get Started</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="login.html" class="btn btn-primary">Get Started</a>
     </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
-      <h1>Smart Shopping for UNILAG Students 🎓</h1>
-      <p>Compare prices, save money, and find the best deals on campus - all in one place</p>
+      <h1>Save Money on Campus Shopping</h1>
+      <p>Track prices across all campus retailers, compare offers in real-time, and save up to 40% on your shopping. Powered by your campus community.</p>
       <div class="hero-buttons">
-        <a href="/login.html?tab=register" class="btn btn-primary">Get Started Free</a>
-        <a href="#demo" class="btn btn-outline">Try Live Demo</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Live Demo Section -->
-  <section class="demo-section" id="demo">
-    <h2 class="section-title">Try It Live - No Sign Up Required!</h2>
-    <p class="section-subtitle">Explore our powerful features with real-time data</p>
-
-    <div class="demo-container">
-      <div class="demo-tabs">
-        <button class="demo-tab active" data-tab="prices">💰 Price Comparison</button>
-        <button class="demo-tab" data-tab="search">🔍 Smart Search</button>
-        <button class="demo-tab" data-tab="analytics">📊 Analytics</button>
-        <button class="demo-tab" data-tab="alerts">🔔 Price Alerts</button>
-      </div>
-
-      <!-- Price Comparison Demo -->
-      <div class="demo-content active" id="prices">
-        <div id="pricesDisplay">
-          <div class="loading"></div> Loading real prices...
-        </div>
-      </div>
-
-      <!-- Search Demo -->
-      <div class="demo-content" id="search">
-        <input type="text" id="searchInput" placeholder="🔍 Search for items, retailers, or locations..." style="width: 100%; padding: 1rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem; margin-bottom: 1rem;">
-        <div id="searchResults"></div>
-      </div>
-
-      <!-- Analytics Demo -->
-      <div class="demo-content" id="analytics">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-          <div style="background: white; padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
-            <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary);" id="totalItems">-</div>
-            <div style="color: #666;">Total Items</div>
-          </div>
-          <div style="background: white; padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
-            <div style="font-size: 2.5rem; font-weight: bold; color: var(--success);" id="avgPrice">-</div>
-            <div style="color: #666;">Avg Price</div>
-          </div>
-          <div style="background: white; padding: 1.5rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
-            <div style="font-size: 2.5rem; font-weight: bold; color: var(--secondary);" id="retailers">-</div>
-            <div style="color: #666;">Retailers</div>
-          </div>
-        </div>
-        <div id="categoryBreakdown"></div>
-      </div>
-
-      <!-- Alerts Demo -->
-      <div class="demo-content" id="alerts">
-        <div style="background: white; padding: 2rem; border-radius: 10px; text-align: center; border: 1px solid var(--border);">
-          <div style="font-size: 3rem; margin-bottom: 1rem;">🔔</div>
-          <h3 style="margin-bottom: 1rem;">Set Custom Price Alerts</h3>
-          <p style="color: #666; margin-bottom: 1.5rem;">Get notified when prices drop below your target. Never miss a deal!</p>
-          <input type="text" placeholder="Item name (e.g., Rice)" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 8px; margin-bottom: 0.8rem;">
-          <input type="number" placeholder="Target price (₦)" style="width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 8px; margin-bottom: 1rem;">
-          <button class="btn btn-primary" onclick="alert('Sign up to start using price alerts!')">Create Alert</button>
-        </div>
+        <a href="login.html?tab=signup" class="btn btn-primary">Join for Free</a>
+        <a href="#features" class="btn btn-outline">Learn More</a>
       </div>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section class="features-section" id="features">
-    <h2 class="section-title">Powerful Features</h2>
-    <p class="section-subtitle">Everything you need for smart campus shopping</p>
-
+  <section class="features" id="features">
+    <h2 class="section-title">Why Choose Price Saver?</h2>
+    <p class="section-subtitle">Everything you need to shop smarter and save more on campus</p>
+    
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">💰</div>
-        <h3>Price Comparison</h3>
-        <p>Compare prices across multiple retailers instantly. Find the best deals without visiting every shop.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">📍</div>
-        <h3>Location-Based Search</h3>
-        <p>Find the nearest stores with the best prices using our integrated Google Maps feature.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🔔</div>
-        <h3>Price Alerts</h3>
-        <p>Set custom alerts and get notified when prices drop below your target. Never miss a deal!</p>
-      </div>
-
-      <div class="feature-card">
         <div class="feature-icon">📊</div>
-        <h3>Real-Time Analytics</h3>
-        <p>Track price trends, analyze spending patterns, and make informed shopping decisions.</p>
+        <h3>Real-Time Tracking</h3>
+        <p>Monitor price changes across multiple campus stores and retailers instantly with our advanced tracking system.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Smart Comparison</h3>
+        <p>Compare identical products across different retailers and locations to find the best deals available on campus.</p>
       </div>
 
       <div class="feature-card">
         <div class="feature-icon">🎯</div>
-        <h3>Smart Filtering</h3>
-        <p>Filter by category, price range, location, and retailer to find exactly what you need.</p>
+        <h3>Price Alerts</h3>
+        <p>Set custom price alerts and get notified instantly when items drop to your target price on any store.</p>
       </div>
 
       <div class="feature-card">
-        <div class="feature-icon">⭐</div>
-        <h3>Community Driven</h3>
-        <p>Contribute prices, earn reputation points, and help fellow students save money.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats Section -->
-  <section class="stats-section" id="stats">
-    <h2 class="section-title" style="color: white;">Making an Impact 🎯</h2>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <h2 id="stat1">0</h2>
-        <p>Active Users</p>
-      </div>
-      <div class="stat-item">
-        <h2 id="stat2">0</h2>
-        <p>Price Comparisons</p>
-      </div>
-      <div class="stat-item">
-        <h2 id="stat3">0</h2>
-        <p>Retailers Tracked</p>
-      </div>
-      <div class="stat-item">
-        <h2 id="stat4">0</h2>
-        <p>Money Saved (₦)</p>
+        <div class="feature-icon">👥</div>
+        <h3>Community Powered</h3>
+        <p>Join thousands of students updating prices daily. Your contributions help everyone save more money.</p>
       </div>
     </div>
   </section>
 
   <!-- CTA Section -->
-  <section class="cta-section">
+  <section class="cta-section" id="how-it-works">
     <div class="cta-content">
-      <h2>Ready to Start Saving?</h2>
-      <p>Join thousands of UNILAG students who are already saving money with smart shopping</p>
-      <a href="/login.html?tab=register" class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;">Get Started Free →</a>
+      <h2>Start Saving Today</h2>
+      <p>Join our community of smart shoppers and take control of your spending. It's free, easy, and takes just 30 seconds to get started.</p>
+      <a href="login.html?tab=signup" class="btn btn-outline">Create Your Account</a>
     </div>
   </section>
 
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-number">2,500+</div>
+      <div class="stat-label">Active Users</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">50K+</div>
+      <div class="stat-label">Products Tracked</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">₦5M+</div>
+      <div class="stat-label">Saved by Users</div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
-    <div class="footer-content">
-      <div class="footer-links">
-        <a href="#demo">Demo</a>
-        <a href="#features">Features</a>
-        <a href="#stats">Statistics</a>
-        <a href="/login.html">Login</a>
-      </div>
-      <p>© 2025 UNILAG Price Saver. Built with ❤️ for UNILAG Students</p>
-    </div>
+    <p>&copy; 2024 UNILAG Price Saver. Smart Shopping Starts Here.</p>
   </footer>
 
   <script>
-    // Mobile menu toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navLinks = document.getElementById('navLinks');
-
-    mobileMenuBtn?.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
-
-    // Navbar scroll effect
+    // Smooth scroll and nav effects
     window.addEventListener('scroll', () => {
       const navbar = document.getElementById('navbar');
-      if (window.scrollY > 50) {
+      if (window.scrollY > 100) {
         navbar.classList.add('scrolled');
       } else {
         navbar.classList.remove('scrolled');
       }
     });
 
-    // Demo tabs
-    const demoTabs = document.querySelectorAll('.demo-tab');
-    const demoContents = document.querySelectorAll('.demo-content');
-
-    demoTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const targetId = tab.dataset.tab;
-        
-        demoTabs.forEach(t => t.classList.remove('active'));
-        demoContents.forEach(c => c.classList.remove('active'));
-        
-        tab.classList.add('active');
-        document.getElementById(targetId).classList.add('active');
-      });
-    });
-
-    // Load real prices from API
-    async function loadPrices() {
-      try {
-        const API_URL = window.location.origin.includes('localhost') 
-          ? 'http://localhost:8000/api' 
-          : `${window.location.origin}/api`;
-        
-        const response = await fetch(`${API_URL}/items/prices/all`);
-        const prices = await response.json();
-        
-        const pricesDisplay = document.getElementById('pricesDisplay');
-        
-        if (prices && prices.length > 0) {
-          // Get categories
-          const categoriesResponse = await fetch(`${API_URL}/items/categories/all`);
-          const categories = await categoriesResponse.json();
-          
-          // Show first 6 prices
-          const displayPrices = prices.slice(0, 6);
-          
-          pricesDisplay.innerHTML = displayPrices.map(price => {
-            const category = categories.find(c => c.id === price.category_id);
-            return `
-              <div class="price-card">
-                <div class="price-card-header">
-                  <div>
-                    <h3>${price.name}</h3>
-                    <span class="category-tag">${category ? category.icon + ' ' + category.name : 'Unknown'}</span>
-                  </div>
-                  <div class="price-value">₦${price.price.toFixed(2)}</div>
-                </div>
-                <div class="price-details">
-                  <div class="price-detail">
-                    <span class="price-detail-label">Brand</span>
-                    <span class="price-detail-value">${price.brand || 'N/A'}</span>
-                  </div>
-                  <div class="price-detail">
-                    <span class="price-detail-label">Retailer</span>
-                    <span class="price-detail-value">${price.retailer || 'N/A'}</span>
-                  </div>
-                  <div class="price-detail">
-                    <span class="price-detail-label">Location</span>
-                    <span class="price-detail-value">${price.location || 'N/A'}</span>
-                  </div>
-                  ${price.pack_size ? `
-                  <div class="price-detail">
-                    <span class="price-detail-label">Pack Size</span>
-                    <span class="price-detail-value">${price.pack_size}${price.pack_unit || ''}</span>
-                  </div>` : ''}
-                </div>
-              </div>
-            `;
-          }).join('');
-
-          // Update analytics
-          document.getElementById('totalItems').textContent = prices.length;
-          const avgPrice = prices.reduce((sum, p) => sum + p.price, 0) / prices.length;
-          document.getElementById('avgPrice').textContent = '₦' + avgPrice.toFixed(0);
-          const uniqueRetailers = new Set(prices.map(p => p.retailer).filter(Boolean));
-          document.getElementById('retailers').textContent = uniqueRetailers.size;
-
-          // Category breakdown
-          const categoryStats = {};
-          prices.forEach(price => {
-            const cat = categories.find(c => c.id === price.category_id);
-            const catName = cat ? cat.name : 'Unknown';
-            categoryStats[catName] = (categoryStats[catName] || 0) + 1;
-          });
-
-          const categoryBreakdown = document.getElementById('categoryBreakdown');
-          categoryBreakdown.innerHTML = '<h3 style="margin-bottom: 1rem;">Category Breakdown</h3>' +
-            Object.entries(categoryStats).map(([cat, count]) => `
-              <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 600;">${cat}</span>
-                <span style="background: var(--primary); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">${count} items</span>
-              </div>
-            `).join('');
-
-        } else {
-          pricesDisplay.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No prices available yet. Be the first to contribute!</p>';
-        }
-      } catch (error) {
-        console.error('Error loading prices:', error);
-        document.getElementById('pricesDisplay').innerHTML = 
-          '<p style="text-align: center; color: #666; padding: 2rem;">Unable to load prices. Please try again later.</p>';
-      }
-    }
-
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    let allPrices = [];
-    let searchTimeout;
-
-    async function initSearch() {
-      try {
-        const API_URL = window.location.origin.includes('localhost') 
-          ? 'http://localhost:8000/api' 
-          : `${window.location.origin}/api`;
-        
-        const response = await fetch(`${API_URL}/items/prices/all`);
-        allPrices = await response.json();
-      } catch (error) {
-        console.error('Error loading prices for search:', error);
-      }
-    }
-
-    searchInput?.addEventListener('input', (e) => {
-      clearTimeout(searchTimeout);
-      const query = e.target.value.trim().toLowerCase();
-
-      if (!query) {
-        searchResults.innerHTML = '';
-        return;
-      }
-
-      searchTimeout = setTimeout(() => {
-        const filtered = allPrices.filter(p =>
-          p.name?.toLowerCase().includes(query) ||
-          p.retailer?.toLowerCase().includes(query) ||
-          p.location?.toLowerCase().includes(query) ||
-          p.brand?.toLowerCase().includes(query)
-        ).slice(0, 5);
-
-        if (filtered.length > 0) {
-          searchResults.innerHTML = filtered.map(p => `
-            <div class="price-card">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <h3 style="margin-bottom: 0.3rem;">${p.name}</h3>
-                  <p style="color: #666; font-size: 0.9rem;">${p.retailer || 'Unknown'} • ${p.location || 'Unknown'}</p>
-                </div>
-                <div class="price-value">₦${p.price.toFixed(2)}</div>
-              </div>
-            </div>
-          `).join('');
-        } else {
-          searchResults.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No results found</p>';
-        }
-      }, 300);
-    });
-
-    // Animate stats counter
-    function animateCounter(id, target, duration = 2000) {
-      const element = document.getElementById(id);
-      const start = 0;
-      const increment = target / (duration / 16);
-      let current = start;
-
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          element.textContent = Math.round(target).toLocaleString();
-          clearInterval(timer);
-        } else {
-          element.textContent = Math.round(current).toLocaleString();
-        }
-      }, 16);
-    }
-
-    // Intersection Observer for stats animation
-    const statsObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateCounter('stat1', 500);
-          animateCounter('stat2', 10000);
-          animateCounter('stat3', 50);
-          animateCounter('stat4', 250000);
-          statsObserver.unobserve(entry.target);
-        }
-      });
-    });
-
-    const statsSection = document.querySelector('.stats-section');
-    if (statsSection) {
-      statsObserver.observe(statsSection);
-    }
-
-    // Initialize on load
-    window.addEventListener('DOMContentLoaded', () => {
-      loadPrices();
-      initSearch();
-    });
-
-    // Smooth scroll
+    // Smooth scrolling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          navLinks.classList.remove('active');
         }
       });
     });

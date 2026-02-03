@@ -1,10 +1,60 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.websockets import WebSocket
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.routers import items, prices, payments, ml, pending, stores, admin_items, auth, google_maps, compare
 from app.database import init_db, SessionLocal
 from app.models import Category
 from contextlib import asynccontextmanager
 import os
+from dotenv import load_dotenv
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi.responses import JSONResponse
+from pathlib import Path
+import json
+from typing import Set
+import logging
+
+load_dotenv()
+logger = logging.getLogger(__name__)
+
+# Rate limiting
+limiter = Limiter(key_func=get_remote_address)
+RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true"
+
+# WebSocket broadcaster (simple in-memory solution)
+class PriceUpdater:
+    """Simple broadcaster for price updates without external dependencies"""
+    def __init__(self):
+        self.subscribers: Set[WebSocket] = set()
+    
+    async def subscribe(self, websocket: WebSocket):
+        await websocket.accept()
+        self.subscribers.add(websocket)
+    
+    async def unsubscribe(self, websocket: WebSocket):
+        self.subscribers.discard(websocket)
+    
+    async def broadcast(self, message: dict):
+        """Broadcast price update to all connected clients"""
+        payload = json.dumps(message)
+        dead_connections = set()
+        
+        for websocket in self.subscribers:
+            try:
+                await websocket.send_text(payload)
+            except Exception as e:
+                logger.error(f"Error broadcasting to websocket: {e}")
+                dead_connections.add(websocket)
+        
+        # Clean up dead connections
+        for ws in dead_connections:
+            await self.unsubscribe(ws)
+
+price_updater = PriceUpdater()
 
 # ------------------------------
 # Lifespan: DB init + seed
@@ -51,6 +101,25 @@ def seed_categories(db):
 # ------------------------------
 app = FastAPI(title="UNILAG Price Saver API", version="1.0.0", lifespan=lifespan)
 
+# Add rate limiter exception handler
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=429,
+        content={
+            "detail": "Too many requests. Please try again later.",
+            "retry_after": 60
+        }
+    )
+
+# Add rate limiter to app state
+if RATE_LIMIT_ENABLED:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exception_handler)
+
+# Inject price_updater into prices router
+from app.routers.prices import set_price_updater
+set_price_updater(price_updater)
 
 # ------------------------------
 # CORS
@@ -103,6 +172,17 @@ if not FRONTEND_DIR.exists():
 
 # 1) Serve static files correctly (only if directory exists)
 if FRONTEND_DIR.exists():
+    # Mount CSS and JS directories at root level for proper relative path resolution
+    css_dir = FRONTEND_DIR / "css"
+    js_dir = FRONTEND_DIR / "js"
+    
+    if css_dir.exists():
+        app.mount("/css", StaticFiles(directory=str(css_dir)), name="css")
+    
+    if js_dir.exists():
+        app.mount("/js", StaticFiles(directory=str(js_dir)), name="js")
+    
+    # Also mount full static folder as fallback
     app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
     
     # 2) Serve index.html as home page
@@ -142,4 +222,76 @@ if FRONTEND_DIR.exists():
         if dashboard_path.exists():
             return FileResponse(dashboard_path)
         return {"error": "File not found"}
+    
+    # Serve public pages
+    @app.get("/search.html", include_in_schema=False)
+    async def serve_search():
+        search_path = FRONTEND_DIR / "search.html"
+        if search_path.exists():
+            return FileResponse(search_path)
+        return {"error": "File not found"}
+    
+    @app.get("/product.html", include_in_schema=False)
+    async def serve_product():
+        product_path = FRONTEND_DIR / "product.html"
+        if product_path.exists():
+            return FileResponse(product_path)
+        return {"error": "File not found"}
+    
+    @app.get("/map", include_in_schema=False)
+    async def serve_map():
+        # Redirect to map.html if it exists, otherwise return error
+        map_path = FRONTEND_DIR / "map.html"
+        if map_path.exists():
+            return FileResponse(map_path)
+        return {"message": "Map page not yet implemented"}
 
+# ========== WEBSOCKET FOR REAL-TIME PRICE UPDATES ==========
+@app.websocket("/ws/prices")
+async def websocket_prices_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for real-time price updates.
+    
+    Clients subscribe to this endpoint to receive live price update notifications.
+    When a new price is submitted, all connected clients are notified.
+    
+    Message format:
+    {
+        "type": "price_update",
+        "item_id": 1,
+        "item_name": "Rice",
+        "store_name": "Shop A",
+        "price": 5000,
+        "timestamp": "2024-02-03T10:30:00Z"
+    }
+    """
+    await price_updater.subscribe(websocket)
+    try:
+        while True:
+            # Keep connection alive and listen for client messages
+            data = await websocket.receive_text()
+            # Could implement client-side subscriptions/filters here if needed
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+    finally:
+        await price_updater.unsubscribe(websocket)
+
+# ========== PUBLIC API ENDPOINT FOR PRICE UPDATES ==========
+@app.get("/api/prices/stream", include_in_schema=False)
+async def stream_prices():
+    """Server-Sent Events (SSE) endpoint for real-time price updates.
+    Better browser compatibility than WebSockets.
+    
+    Usage:
+    const eventSource = new EventSource('/api/prices/stream');
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Price update:', data);
+    };
+    """
+    async def event_generator():
+        # This would need to be implemented with actual event streaming
+        # For now, return a simple placeholder
+        yield "data: {\"message\": \"Connected to price stream\"}\n\n"
+    
+    from fastapi.responses import StreamingResponse
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

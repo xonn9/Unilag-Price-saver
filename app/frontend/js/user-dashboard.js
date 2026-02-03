@@ -23,6 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
   bindFormSubmit();
   loadInitialData();
   setupMobileNav();
+  
+  // Setup close buttons for all modals
+  const closeButtons = [
+    { id: 'categoryInsightsClose', modal: 'categoryInsightsModal' },
+    { id: 'profileCloseBtn', modal: 'profileModal' },
+    { id: 'locationModalClose', modal: 'locationModal' },
+    { id: 'alertCancelBtn', modal: 'alertModal' },
+    { id: 'retailerCloseBtn', modal: 'retailerModal' }
+  ];
+
+  closeButtons.forEach(({ id, modal }) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', () => closeModal(modal));
+    }
+  });
 });
 
 function guardAccess() {
@@ -175,7 +191,7 @@ function handleNavAction(action) {
         sessionStorage.clear();
         
         // Redirect to login page
-        window.location.href = '/login.html';
+        window.location.href = 'login.html';
       }
       break;
       
@@ -318,22 +334,8 @@ function populateProfileModal() {
   `;
 }
 
-// Setup close buttons for all modals
-document.addEventListener('DOMContentLoaded', () => {
-  const closeButtons = [
-    { id: 'categoryInsightsClose', modal: 'categoryInsightsModal' },
-    { id: 'profileCloseBtn', modal: 'profileModal' },
-    { id: 'locationModalClose', modal: 'locationModal' },
-    { id: 'alertCancelBtn', modal: 'alertModal' }
-  ];
-
-  closeButtons.forEach(({ id, modal }) => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.addEventListener('click', () => closeModal(modal));
-    }
-  });
-});
+// Modal close buttons are now set up in main DOMContentLoaded event above
+// Removed duplicate DOMContentLoaded listener
 
 // ==================== FILTERS ====================
 

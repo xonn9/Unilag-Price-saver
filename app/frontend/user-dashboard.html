@@ -184,10 +184,14 @@
   <!-- Alert Modal -->
   <div class="alert-modal" id="alertModal" aria-hidden="true">
     <div class="alert-modal-content" role="dialog" aria-modal="true">
-      <h3 class="modal-title">🔔 Set Price Alert</h3>
-      <div class="form-group"><label>Item Name</label><input type="text" id="alertItemName" readonly></div>
-      <div class="form-group"><label>Notify me when price is below (₦)</label><input type="number" id="alertThreshold" step="0.01"></div>
-      <div class="modal-actions"><button class="secondary" id="alertCancelBtn">Cancel</button><button id="alertSaveBtn">Save Alert</button></div>
+      <h3 class="modal-title">🔔 My Alerts</h3>
+      <div id="alertModalBody"></div>
+      <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+        <h4 style="margin-bottom: 1rem;">Create New Alert</h4>
+        <div class="form-group"><label>Item Name</label><input type="text" id="alertItemName" placeholder="Enter item name"></div>
+        <div class="form-group"><label>Notify me when price is below (₦)</label><input type="number" id="alertThreshold" step="0.01" placeholder="Enter price threshold"></div>
+        <div class="modal-actions"><button class="secondary" id="alertCancelBtn">Cancel</button><button id="alertSaveBtn">Save Alert</button></div>
+      </div>
     </div>
   </div>
 
@@ -218,6 +222,6 @@
   </div>
 
   <!-- Main JS entry (ES module) -->
-  <script type="module" src="/static/js/user-dashboard.js"></script>
+  <script type="module" src="js/user-dashboard.js"></script>
 </body>
 </html>

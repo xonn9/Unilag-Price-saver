@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import Item, ItemSubmission, User
 from app.schemas import ItemCreate, ItemOut, ItemSubmissionCreate, ItemSubmissionOut
+from app.routers.auth import get_current_admin, get_current_user
 from datetime import datetime
 import os
 from typing import List, Optional
@@ -40,15 +41,13 @@ def list_all_items(db: Session = Depends(get_db)):
 @router.post("/", response_model=ItemOut)
 def create_public_item(
     item: ItemCreate,
-    x_admin_key: Optional[str] = None,
+    current_admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
     """
     ADMIN ONLY: Add item to general database (visible to all users)
-    Requires admin API key header: x-admin-key
+    Requires valid JWT token with admin role
     """
-    get_admin_key(x_admin_key)
-    
     # Check if item already exists
     existing = db.query(Item).filter(Item.name == item.name).first()
     if existing:
@@ -61,7 +60,7 @@ def create_public_item(
         name=item.name,
         category=item.category,
         is_public=True,  # Admin-created items are immediately public
-        created_by=1  # TODO: Replace with actual admin user ID from token
+        created_by=current_admin.id  # Use authenticated admin user ID
     )
     db.add(new_item)
     db.commit()
@@ -117,15 +116,13 @@ def get_submission_by_number(
 def approve_submission(
     item_number: str,
     admin_notes: Optional[str] = None,
-    x_admin_key: Optional[str] = None,
+    current_admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
     """
     ADMIN ONLY: Approve user submission and create public item
     Also stores the admin notes/feedback
     """
-    get_admin_key(x_admin_key)
-    
     submission = db.query(ItemSubmission).filter(
         ItemSubmission.item_number == item_number
     ).first()
@@ -149,7 +146,7 @@ def approve_submission(
             name=submission.name,
             category=submission.category,
             is_public=True,
-            created_by=1  # TODO: Replace with actual admin user ID
+            created_by=current_admin.id  # Use authenticated admin user ID
         )
         db.add(new_item)
         db.flush()
@@ -157,7 +154,7 @@ def approve_submission(
     # Update submission status
     submission.status = "approved"
     submission.approved_at = datetime.utcnow()
-    submission.approved_by = 1  # TODO: Replace with actual admin user ID
+    submission.approved_by = current_admin.id  # Use authenticated admin user ID
     submission.admin_notes = admin_notes
     
     db.commit()
@@ -216,6 +213,7 @@ async def submit_item(
     location: str = Form(...),
     submitter_email: Optional[str] = Form(None),
     image: Optional[UploadFile] = File(None),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -267,7 +265,7 @@ async def submit_item(
         category=category,
         price=price,
         location=location,
-        submitter_id=1,  # TODO: Replace with actual user ID from token
+        submitter_id=current_user.id,  # Use authenticated user ID from token
         submission_folder=submission_folder,
         image_path=image_path,
         status="pending"

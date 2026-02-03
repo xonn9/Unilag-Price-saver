@@ -46,6 +46,7 @@
 ### Our Solution
 
 A **real-time, collaborative price discovery ecosystem** featuring:
+
 - 🗺️ Interactive location-based price mapping
 - 🤖 ML-powered price predictions
 - 🔔 Smart price alerts
@@ -58,6 +59,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 ## ✨ Key Features
 
 ### 🔐 User Authentication & Profiles
+
 - **Secure Registration**: Username/password-based account creation
 - **Persistent Sessions**: User data persists across login sessions
 - **User Reputation System**: Trust scores based on submission accuracy
@@ -65,6 +67,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 - **Profile Management**: Track submissions, alerts, and achievements
 
 ### 💰 Price Management
+
 - **Submit Prices**: Easy-to-use form for price submissions
 - **Price Comparison**: Compare prices across multiple retailers
 - **Category Filtering**: Organize by Edibles, Drinks, and Non-Edibles
@@ -72,24 +75,28 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 - **Price History**: Track price changes over time
 
 ### 🔔 Smart Price Alerts
+
 - **Custom Thresholds**: Set alerts for specific price points
 - **Real-time Notifications**: Get notified when prices drop
 - **Alert Management**: View and manage all active alerts
 - **Badge Indicators**: Visual indicators for active alerts
 
 ### 📊 Analytics & Insights
+
 - **Category Insights**: Analytics dashboard per category
 - **Trending Items**: Top 5 trending items by submissions
 - **Price Statistics**: Average, min, max prices per category
 - **Submission Tracking**: Track total submissions and approval rates
 
 ### 🗺️ Location Features
+
 - **Interactive Map Picker**: Google Maps integration for location selection
 - **Reverse Geocoding**: Convert coordinates to addresses
 - **Place Autocomplete**: Search and select locations easily
 - **Location-based Filtering**: Filter prices by campus location
 
 ### 📱 Mobile Experience
+
 - **Responsive Design**: Optimized for all screen sizes
 - **Bottom Navigation**: Easy mobile navigation (Home, Trends, Submit, Map, Profile)
 - **Touch-Friendly**: Large buttons and optimized touch targets
@@ -97,6 +104,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 - **Dark Mode**: Beautiful dark theme support
 
 ### 👨‍💼 Admin Dashboard
+
 - **Price Moderation**: Approve/reject price submissions
 - **System Overview**: Statistics and activity monitoring
 - **Category Management**: Manage item categories
@@ -107,6 +115,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 ## 🛠 Tech Stack
 
 ### Backend
+
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | **API Framework** | FastAPI 0.104+ | High-performance async API |
@@ -116,6 +125,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 | **Payments** | Squad API | Payment processing |
 
 ### Frontend
+
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | **Markup** | HTML5 | Structure |
@@ -125,6 +135,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 | **Storage** | LocalStorage | Client-side data persistence |
 
 ### Development Tools
+
 - **Python**: 3.9+
 - **Rust**: 1.70+
 - **Maturin**: Rust-Python bindings
@@ -135,7 +146,7 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 
 ## 🏗 Architecture
 
-```
+```txt
 ┌─────────────────────────────────────────────────────────────┐
 │                      Frontend Layer                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
@@ -178,15 +189,111 @@ A **real-time, collaborative price discovery ecosystem** featuring:
 
 ---
 
-## 🚀 Getting Started
+## 🌐 Public Browsing (No Login Required)
 
-### Prerequisites
+UNILAG Price Saver allows anyone to browse products and prices **without creating an account**. Think of it like Jumia or other e-commerce platforms — public users can view and search, but certain actions require login.
 
-- **Python** 3.9 or higher
-- **Rust** 1.70 or higher
-- **pip** (Python package manager)
-- **maturin** (for Rust-Python bindings)
-- **Google Maps API Key** (for location features)
+### What Public Users Can Access
+
+✅ **Fully Public:**
+- 🏠 **Home Page** (`/`) — Hero, featured deals, trending items, category showcase
+- 🔍 **Search** (`/search.html?q=...`) — Full-text search with filtering, sorting, and pagination
+- 🏷️ **Categories** (`/search.html?category=EDIBLES`) — Browse by category (Edibles, Drinks, Non-Edibles)
+- 📄 **Product Details** (`/product.html?id=123`) — Price history, all available retailers, price trends, min/max/avg pricing
+- 🗺️ **Store Map** (`/map`) — Interactive map showing store locations and average prices per store
+- 📊 **Trending** (`/trending`) — Top products by submission count and price activity
+
+**All prices shown are READ-ONLY** — public users see real-time price data but cannot modify anything.
+
+### What Requires Login
+
+🔐 **Account Required:**
+- ✏️ **Submit Prices** — Add/update prices for items
+- 🔔 **Price Alerts** — Set custom price thresholds and get notified
+- ❤️ **Save Items** — Bookmark favorite products (wishlist)
+- 👤 **User Profile** — View submission history, points, reputation
+- 🛒 **Shopping Cart** — Create baskets for comparison
+
+**CTAs for public users:**
+- "Login to Submit Prices" buttons visible on product pages
+- "Save Item" buttons prompt to login
+- Alerts section shows "Create an account to set alerts"
+
+### API Privacy & Sanitization
+
+All public API endpoints (`/api/items/*`, `/api/prices/all`) return:
+- ✅ Item names, prices, store names, locations
+- ✅ Price history and trends
+- ✅ Category information
+- ❌ **NOT** user email addresses, admin fields, or personal data
+
+Sensitive endpoints require authentication:
+- POST `/api/prices/` — Requires user ID
+- PUT/DELETE operations — Require appropriate permissions
+- Admin endpoints — Require admin API key
+
+### Real-time Price Updates
+
+Public users see live price updates via WebSocket:
+- Connect to `/ws/prices` to receive price feed
+- Prices update in-place on search/product pages
+- No authentication needed for reading live stream
+
+---
+
+## 🎨 Professional Design System
+
+### Mature Color Palette
+
+The UI uses a professional, trustworthy color system (non-neon, e-commerce standard):
+
+```css
+/* Primary: Deep Slate (banking/professional standard) */
+--color-primary: #12202B
+
+/* Accent: Muted Teal (calm, accessible) */
+--color-accent: #187A6F
+
+/* Backgrounds: Warm Neutral (reduces eye strain) */
+--color-bg: #F5F4F2
+
+/* Text: Charcoal (high contrast WCAG AA) */
+--color-text: #0F1720
+
+/* Status Colors (subtle, not neon) */
+--color-success: #1E7A3E     /* Subtle green */
+--color-danger: #A02A2A      /* Subtle red */
+--color-warning: #B8860B     /* Muted gold */
+```
+
+### Light + Dark Mode
+
+Automatically respects `prefers-color-scheme: dark` or use `data-theme="dark"` on `<html>` element:
+
+```html
+<html data-theme="dark">
+  <!-- Dark mode enabled -->
+</html>
+```
+
+### Typography & Spacing
+
+- **System Font Stack**: Uses OS native fonts for best performance
+- **Spacing Grid**: 8px baseline (4, 8, 16, 24, 32, 48, 64px)
+- **Transitions**: All transitions use `cubic-bezier(0.4, 0, 0.2, 1)` for smooth feel
+- **Animations**: Fast transitions (120–150ms), no heavy effects
+
+### Accessibility
+
+- ✅ Color contrast ≥ 4.5:1 for body text (WCAG AA)
+- ✅ Focus rings on all interactive elements
+- ✅ Semantic HTML with ARIA attributes
+- ✅ Keyboard navigation fully supported
+- ✅ Mobile-first responsive design (no horizontal scroll)
+
+---
+
+
 
 ### Installation
 

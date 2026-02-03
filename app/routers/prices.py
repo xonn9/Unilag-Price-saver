@@ -1,14 +1,22 @@
 from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, Header, status
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
-from app.models import Price, PendingPrice, User, Transaction
+from app.models import Price, PendingPrice, User, Transaction, Item
 from app.schemas import PriceCreate, PriceOut, PendingPriceOut
 from app.services.price_engine import compute_cheapest_price
 from datetime import datetime
-import os, time
+import os, time, asyncio, json
 from typing import Optional
 
 router = APIRouter(prefix="/prices", tags=["Prices"])
+
+# Global reference to price updater (injected from main.py)
+price_updater = None
+
+def set_price_updater(updater):
+    """Set the price updater broadcaster instance"""
+    global price_updater
+    price_updater = updater
 
 """
 Serverless note: Vercel's Python runtime has a read-only filesystem except /tmp.
@@ -57,6 +65,29 @@ def submit_price(price: PriceCreate, db: Session = Depends(get_db)):
     db.add(new_price)
     db.commit()
     db.refresh(new_price)
+    
+    # Broadcast price update to WebSocket clients
+    if price_updater:
+        try:
+            item = db.query(Item).filter(Item.id == price.item_id).first()
+            store_name = location
+            
+            update_payload = {
+                "type": "price_update",
+                "item_id": price.item_id,
+                "item_name": item.name if item else "Unknown",
+                "store_name": store_name,
+                "price": float(amount),
+                "timestamp": new_price.created_at.isoformat() if new_price.created_at else datetime.utcnow().isoformat()
+            }
+            
+            # Run broadcast in background without blocking response
+            asyncio.create_task(price_updater.broadcast(update_payload))
+        except Exception as e:
+            # Log but don't fail if broadcast fails
+            import logging
+            logging.error(f"Failed to broadcast price update: {e}")
+    
     return new_price
 
 @router.get("/compare/{item_id}")

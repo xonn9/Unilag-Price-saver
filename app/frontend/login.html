@@ -4,740 +4,643 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>UNILAG Price Saver - Join Now</title>
+  <link rel="stylesheet" href="css/design-system.css" />
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    
     :root {
-      --primary: #667eea;
-      --primary-dark: #5568d3;
-      --success: #34C759;
-      --danger: #FF3B30;
-      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --primary-dark: var(--color-primary-dark);
+      --primary: var(--color-primary);
+      --accent: var(--color-primary-light);
+      --light-bg: var(--color-bg-primary);
+      --slate: var(--color-text-secondary);
+      --border: var(--color-border);
+      --success: var(--color-success);
+      --danger: var(--color-danger);
+      --bg-gradient: var(--gradient-primary);
+      --shadow-lg: var(--shadow-lg);
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg-gradient);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-lg);
     }
 
     .login-container {
-      background:white;
-      border-radius:24px;
-      box-shadow:0 20px 60px rgba(0,0,0,.3);
-      overflow:hidden;
-      max-width:1100px;
-      width:100%;
-      display:grid;
-      grid-template-columns:1.2fr 1fr;
-      min-height:640px;
-      animation: fadeIn 0.6s ease;
+      background: var(--light-bg);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      min-height: 700px;
+      animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Branding Side */
     .login-branding {
       background: var(--bg-gradient);
-      color:white;
-      padding:3rem;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .login-branding::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
-      opacity: 0.3;
-    }
-
-    .branding-content {
-      position: relative;
-      z-index: 1;
+      color: white;
+      padding: 4rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .login-branding-icon {
-      font-size:4rem;
-      margin-bottom:1.5rem;
-      animation: bounce 2s ease-in-out infinite;
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      animation: bounce 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
     }
 
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-15px); }
     }
 
     .login-branding h1 {
-      font-size:2.2rem;
-      margin-bottom:1rem;
-      font-weight:800;
+      color: white;
+      font-size: 2.8rem;
+      margin-bottom: 0.8rem;
+      font-weight: 800;
     }
 
-    .login-branding p {
-      font-size:1.1rem;
-      opacity:.95;
-      line-height:1.6;
-      margin-bottom:2rem;
+    .login-branding > p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.15rem;
+      margin-bottom: 2rem;
     }
 
     .features {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
     }
 
     .feature-item {
-      display:flex;
-      align-items:center;
-      gap:1rem;
-      font-size:1rem;
-      padding: 0.8rem;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.95rem;
+      padding: 1rem 1.2rem;
+      background: rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      animation: slideIn 0.6s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
+    .feature-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(8px);
     }
 
     .feature-item::before {
       content: "✓";
-      font-weight:bold;
-      font-size:1.5rem;
-      background: white;
-      color: var(--primary);
-      width: 32px;
-      height: 32px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+      font-size: 1.2rem;
     }
 
-    /* Form Side */
     .login-form-section {
-      padding:3rem 2.5rem;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
+      padding: 4rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .form-tabs {
-      display:flex;
-      gap:1rem;
-      margin-bottom:2rem;
-      border-bottom:2px solid #eee;
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 2px solid var(--border);
     }
 
     .form-tab {
-      padding:1rem 1.5rem;
-      text-align:center;
-      cursor:pointer;
-      border:none;
-      background:none;
-      font-size:1rem;
-      font-weight:600;
-      color:#999;
-      transition:all .3s;
-      border-bottom:3px solid transparent;
-      margin-bottom:-2px;
-      flex: 1;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--slate);
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      position: relative;
     }
 
     .form-tab.active {
-      color:var(--primary);
-      border-bottom-color:var(--primary);
+      color: var(--primary);
+      border-bottom-color: var(--primary);
     }
 
     .form-tab:hover {
-      color:var(--primary);
+      color: var(--primary);
     }
 
     .form-content {
-      display:none;
-      animation: fadeIn 0.3s ease;
+      display: none;
     }
 
     .form-content.active {
-      display:block;
+      display: block;
+      animation: fadeInForm 0.3s ease;
+    }
+
+    @keyframes fadeInForm {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .section-title {
-      margin-bottom:1.5rem;
-      color:#333;
-      font-size:1.8rem;
+      margin-bottom: 1.8rem;
+      color: var(--primary-dark);
+      font-size: 1.7rem;
       font-weight: 700;
     }
 
     .form-group {
-      margin-bottom:1.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    label {
-      display:block;
-      margin-bottom:0.6rem;
-      font-weight:600;
-      color:#333;
-      font-size:0.95rem;
+    .form-group label {
+      display: block;
+      margin-bottom: 0.7rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      font-size: 0.95rem;
     }
 
-    input, select {
-      width:100%;
-      padding:1rem;
-      border:2px solid #eee;
-      border-radius:10px;
-      font-size:1rem;
-      font-family:inherit;
-      transition:border .3s;
+    .form-group input {
+      width: 100%;
+      padding: 0.9rem 1.1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      background: white;
+      color: var(--primary-dark);
     }
 
-    input:focus, select:focus {
-      outline:none;
-      border-color:var(--primary);
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    .form-group input::placeholder {
+      color: var(--slate);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-group-password {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--slate);
+      font-size: 1.1rem;
+      transition: color 0.3s ease;
+    }
+
+    .toggle-password:hover {
+      color: var(--primary);
     }
 
     .password-info {
-      background:#f0f4ff;
-      padding:1rem;
-      border-radius:10px;
-      margin-bottom:1.5rem;
-      font-size:0.9rem;
-      color:var(--primary);
-      border-left:4px solid var(--primary);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+      padding: 1rem;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--primary-dark);
+      line-height: 1.6;
     }
 
-    .login-btn {
-      width:100%;
-      padding:1rem;
-      background:var(--bg-gradient);
-      color:white;
-      border:none;
-      border-radius:10px;
-      font-size:1.05rem;
-      font-weight:600;
-      cursor:pointer;
-      transition:all .3s;
-      margin-top:1rem;
+    .password-info strong {
+      color: var(--primary-dark);
+      font-weight: 700;
     }
 
-    .login-btn:hover:not(:disabled) {
-      transform:translateY(-2px);
-      box-shadow:0 10px 25px rgba(102,126,234,.4);
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
     }
 
-    .login-btn:active {
-      transform:translateY(0);
+    .remember-me input {
+      width: auto;
+      cursor: pointer;
+      accent-color: var(--primary);
     }
 
-    .login-btn:disabled {
-      opacity:.7;
-      cursor:not-allowed;
+    .remember-me label {
+      margin-bottom: 0;
+      cursor: pointer;
+      color: var(--slate);
+      font-weight: 500;
     }
 
-    .login-btn.alt {
-      background:#34C759;
-      margin-top:1rem;
+    .forgot-password {
+      text-align: right;
+      margin-bottom: 1.5rem;
     }
 
-    .login-btn.neutral {
-      background:#888;
+    .forgot-password a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.3s ease;
     }
 
-    .status-message {
-      padding:1rem;
-      border-radius:10px;
-      margin-bottom:1.5rem;
-      font-size:0.95rem;
-      display:none;
-      animation: slideDown 0.3s ease;
+    .forgot-password a:hover {
+      color: var(--accent);
+      text-decoration: underline;
     }
 
-    @keyframes slideDown {
+    .btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      transition: left 0.5s ease;
+      z-index: 0;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+    }
+
+    .error-message,
+    .success-message {
+      padding: 1rem;
+      border-radius: 10px;
+      border-left: 4px solid;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+
+    .error-message.show,
+    .success-message.show {
+      display: block;
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      border-color: var(--danger);
+      color: #DC2626;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+      border-color: var(--success);
+      color: #059669;
+    }
+
+    @keyframes slideIn {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .status-message.success {
-      background:#d4edda;
-      color:#155724;
-      border:1px solid #c3e6cb;
-      display:block;
+    .signup-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--slate);
     }
 
-    .status-message.error {
-      background:#f8d7da;
-      color:#721c24;
-      border:1px solid #f5c6cb;
-      display:block;
+    .signup-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
     }
 
-    .center-note {
-      text-align:center;
-      margin-top:1.5rem;
+    .signup-link a:hover {
+      color: var(--accent);
+      text-decoration: underline;
     }
 
-    .small-note {
-      font-size:0.95rem;
-      color:#666;
-      margin-bottom:0.8rem;
-    }
-
-    .spinner {
-      display:inline-block;
-      width:14px;
-      height:14px;
-      border:2px solid rgba(255,255,255,.3);
-      border-top:2px solid white;
-      border-radius:50%;
-      animation:spin .8s linear infinite;
-      margin-right:8px;
-    }
-
-    @keyframes spin {
-      to{ transform:rotate(360deg); }
-    }
-
-    /* Error validation */
-    input.error {
-      border-color: var(--danger);
-    }
-
-    .error-message {
-      color: var(--danger);
-      font-size: 0.85rem;
-      margin-top: 0.3rem;
-      display: none;
-    }
-
-    .error-message.show {
-      display: block;
-      animation: shake 0.5s ease;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    /* Responsive */
-    @media (max-width:1024px) {
+    @media (max-width: 768px) {
       .login-container {
-        grid-template-columns:1fr;
-        max-width:600px;
+        grid-template-columns: 1fr;
+        min-height: auto;
       }
-      
+
       .login-branding {
-        border-radius:24px 24px 0 0;
+        padding: 2rem;
+        display: none;
+      }
+
+      .login-form-section {
         padding: 2rem;
       }
-    }
 
-    @media (max-width:768px) {
-      .login-container {
-        min-height:unset;
+      .form-tab {
+        padding: 0.8rem 1rem;
+        font-size: 0.85rem;
       }
-      
-      .login-branding {
-        padding:2rem 1.5rem;
-      }
-      
-      .login-form-section {
-        padding:2rem 1.5rem;
+
+      .btn {
+        padding: 0.9rem 1rem;
+        font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <!-- Branding -->
     <div class="login-branding">
       <div class="branding-content">
-        <div class="login-branding-icon">🛍️</div>
-        <h1>UNILAG Price Saver</h1>
-        <p>Smart price comparison and shopping recommendations for UNILAG students</p>
-
+        <div class="login-branding-icon">🛒</div>
+        <h1>Price Saver</h1>
+        <p>Smart Campus Shopping Starts Here</p>
+        
         <div class="features">
-          <div class="feature-item">Find lowest prices across campus</div>
-          <div class="feature-item">Smart shopping recommendations</div>
-          <div class="feature-item">Real-time price updates</div>
-          <div class="feature-item">Save money on every trip</div>
+          <div class="feature-item">Real-time price tracking across campus</div>
+          <div class="feature-item">Compare prices from multiple retailers</div>
+          <div class="feature-item">Save up to 40% on your shopping</div>
+          <div class="feature-item">Community-driven price updates</div>
         </div>
       </div>
     </div>
 
-    <!-- Form Section -->
     <div class="login-form-section">
-      <!-- Tabs -->
-      <div class="form-tabs" role="tablist">
-        <button class="form-tab" data-mode="user" type="button"> User</button>
-        <button class="form-tab active" data-mode="register" type="button"> Sign Up</button>
-        <button class="form-tab" data-mode="admin" type="button"> Admin</button>
+      <div class="form-tabs">
+        <button class="form-tab active" onclick="switchTab('login')">Sign In</button>
+        <button class="form-tab" onclick="switchTab('signup')">Join Us</button>
       </div>
 
-      <!-- User Login -->
-      <div id="userLogin" class="form-content" data-content="user">
-        <h2 class="section-title">Welcome Back!</h2>
-        <div id="userStatus" class="status-message" aria-live="polite"></div>
+      <div class="form-content active" id="login-content">
+        <h2 class="section-title">Welcome Back</h2>
+        <div id="loginError" class="error-message"></div>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input 
+              type="email" 
+              id="login-email" 
+              placeholder="you@unilag.edu.ng" 
+              required
+            >
+          </div>
 
-        <div class="form-group">
-          <label for="userUsername">Username</label>
-          <input type="text" id="userUsername" placeholder="Enter your username" autocomplete="username">
-          <div class="error-message" id="userUsernameError"></div>
-        </div>
+          <div class="form-group form-group-password">
+            <label for="login-password">Password</label>
+            <input 
+              type="password" 
+              id="login-password" 
+              placeholder="••••••••" 
+              required
+            >
+            <button type="button" class="toggle-password" onclick="togglePassword('login-password')">👁️</button>
+          </div>
 
-        <div class="form-group">
-          <label for="userPassword">Password</label>
-          <input type="password" id="userPassword" placeholder="Enter your password" autocomplete="current-password">
-          <div class="error-message" id="userPasswordError"></div>
-        </div>
+          <div class="remember-me">
+            <input type="checkbox" id="remember" name="remember">
+            <label for="remember">Remember me</label>
+          </div>
 
-        <button id="userLoginBtn" class="login-btn" type="button">
-          <span id="userLoginText">Login</span>
-        </button>
+          <div class="forgot-password">
+            <a href="#reset">Forgot your password?</a>
+          </div>
 
-        <div class="center-note">
-          <p class="small-note">Don't have an account?</p>
-          <button id="toRegisterBtn" class="login-btn alt" type="button">Create Free Account</button>
-        </div>
-      </div>
+          <button type="submit" class="btn btn-login">Sign In</button>
+        </form>
 
-      <!-- User Registration -->
-      <div id="userRegister" class="form-content active" data-content="register">
-        <h2 class="section-title">Join UNILAG Price Saver</h2>
-        <div id="registerStatus" class="status-message" aria-live="polite"></div>
-
-        <div class="form-group">
-          <label for="regUsername">Username</label>
-          <input type="text" id="regUsername" placeholder="Choose a username" autocomplete="username">
-          <div class="error-message" id="regUsernameError"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="regPassword">Password</label>
-          <input type="password" id="regPassword" placeholder="Create a password (min 4 characters)" autocomplete="new-password">
-          <div class="error-message" id="regPasswordError"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="regPasswordConfirm">Confirm Password</label>
-          <input type="password" id="regPasswordConfirm" placeholder="Confirm your password" autocomplete="new-password">
-          <div class="error-message" id="regPasswordConfirmError"></div>
-        </div>
-
-        <button id="registerBtn" class="login-btn" type="button">
-          <span id="registerText">Create Free Account</span>
-        </button>
-
-        <div class="center-note">
-          <p class="small-note">Already have an account?</p>
-          <button id="toLoginBtn" class="login-btn neutral" type="button">Back to Login</button>
+        <div class="signup-link">
+          Don't have an account? <a href="#" onclick="switchTab('signup'); return false;">Create one</a>
         </div>
       </div>
 
-      <!-- Admin Login -->
-      <div id="adminLogin" class="form-content" data-content="admin">
-        <h2 class="section-title">Admin Access</h2>
-        <div id="adminStatus" class="status-message" aria-live="polite"></div>
+      <div class="form-content" id="signup-content">
+        <h2 class="section-title">Join Us Today</h2>
+        <div id="signupError" class="error-message"></div>
+        
+        <form id="signupForm" onsubmit="handleSignup(event)">
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <input 
+              type="text" 
+              id="signup-name" 
+              placeholder="Your full name" 
+              required
+            >
+          </div>
 
-        <div class="password-info">
-          🔐 Admin access requires special authentication
+          <div class="form-group">
+            <label for="signup-email">Email Address</label>
+            <input 
+              type="email" 
+              id="signup-email" 
+              placeholder="you@unilag.edu.ng" 
+              required
+            >
+          </div>
+
+          <div class="form-group form-group-password">
+            <label for="signup-password">Password</label>
+            <input 
+              type="password" 
+              id="signup-password" 
+              placeholder="••••••••" 
+              required
+            >
+            <button type="button" class="toggle-password" onclick="togglePassword('signup-password')">👁️</button>
+          </div>
+
+          <div class="form-group form-group-password">
+            <label for="signup-confirm">Confirm Password</label>
+            <input 
+              type="password" 
+              id="signup-confirm" 
+              placeholder="••••••••" 
+              required
+            >
+            <button type="button" class="toggle-password" onclick="togglePassword('signup-confirm')">👁️</button>
+          </div>
+
+          <div class="password-info">
+            <strong>Password Requirements:</strong><br>
+            • At least 8 characters<br>
+            • Mix of uppercase & lowercase<br>
+            • Include numbers & special characters
+          </div>
+
+          <button type="submit" class="btn btn-login">Create Account</button>
+        </form>
+
+        <div class="signup-link">
+          Already have an account? <a href="#" onclick="switchTab('login'); return false;">Sign in here</a>
         </div>
-
-        <div class="form-group">
-          <label for="adminUsername">Admin Username</label>
-          <input type="text" id="adminUsername" placeholder="Enter admin username" autocomplete="username">
-          <div class="error-message" id="adminUsernameError"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="adminKey">Admin API Key</label>
-          <input type="password" id="adminKey" placeholder="Enter your admin API key" autocomplete="current-password">
-          <div class="error-message" id="adminKeyError"></div>
-        </div>
-
-        <button id="adminLoginBtn" class="login-btn" type="button">
-          <span id="adminLoginText">Login as Admin</span>
-        </button>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    const API_URL = (() => {
-      const hostname = window.location.hostname;
-      const origin = window.location.origin;
-      
-      if (hostname.includes('vercel.app') || hostname.includes('vercel.com')) {
-        return `${origin}/api`;
-      }
-      
-      if (hostname.includes('render.com') || hostname.includes('onrender.com')) {
-        return `${origin}/api`;
-      }
-      
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        const port = window.location.port;
-        if (port === '8000' || !port) {
-          return `${origin}/api`;
-        }
-        return 'http://localhost:8000/api';
-      }
-      
-      return `${origin}/api`;
-    })();
-
-    // Tab switching
-    function initTabs() {
-      const tabs = document.querySelectorAll('.form-tab');
-      const contents = document.querySelectorAll('.form-content');
-      
-      function activateMode(mode) {
-        tabs.forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
-        contents.forEach(c => {
-          const show = c.dataset.content === mode || (mode === 'user' && c.id === 'userLogin');
-          c.classList.toggle('active', show);
-        });
-      }
-      
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => activateMode(tab.dataset.mode));
-      });
-      
-      document.getElementById('toRegisterBtn')?.addEventListener('click', () => activateMode('register'));
-      document.getElementById('toLoginBtn')?.addEventListener('click', () => activateMode('user'));
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.form-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.form-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(tab + '-content').classList.add('active');
+      event.target.classList.add('active');
     }
 
-    // Validation
-    function validateField(input, rules) {
-      const value = input.value.trim();
-      const errorEl = document.getElementById(`${input.id}Error`);
-      
-      input.classList.remove('error');
-      errorEl.classList.remove('show');
-      
-      if (rules.required && !value) {
-        input.classList.add('error');
-        errorEl.textContent = 'This field is required';
-        errorEl.classList.add('show');
-        return false;
-      }
-      
-      if (rules.minLength && value.length < rules.minLength) {
-        input.classList.add('error');
-        errorEl.textContent = `Minimum ${rules.minLength} characters required`;
-        errorEl.classList.add('show');
-        return false;
-      }
-      
-      return true;
+    function togglePassword(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.type = field.type === 'password' ? 'text' : 'password';
     }
 
-    function showStatus(el, type, message) {
-      if (!el) return;
-      el.className = `status-message ${type}`;
-      el.textContent = message;
+    function showError(type, message) {
+      const errorEl = document.getElementById(type + 'Error');
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+      setTimeout(() => errorEl.classList.remove('show'), 5000);
     }
 
-    function disableButton(btn, disabled, text) {
-      if (!btn) return;
-      btn.disabled = disabled;
-      const span = btn.querySelector('span');
-      if (text && span) span.innerHTML = text;
-    }
-
-    // User Registration
-    async function registerUser() {
-      const username = document.getElementById('regUsername');
-      const password = document.getElementById('regPassword');
-      const passwordConfirm = document.getElementById('regPasswordConfirm');
-      const statusEl = document.getElementById('registerStatus');
-      const btn = document.getElementById('registerBtn');
-
-      // Validate
-      const isValid = [
-        validateField(username, { required: true }),
-        validateField(password, { required: true, minLength: 4 }),
-        validateField(passwordConfirm, { required: true })
-      ].every(v => v);
-
-      if (!isValid) return;
-
-      if (password.value !== passwordConfirm.value) {
-        showStatus(statusEl, 'error', '❌ Passwords do not match');
-        passwordConfirm.classList.add('error');
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      
+      if (!email || !password) {
+        showError('login', 'Please fill in all fields');
         return;
       }
 
-      disableButton(btn, true, '<span class="spinner"></span>Creating account...');
-
       try {
-        const res = await fetch(`${API_URL}/auth/register`, {
+        const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: username.value.trim(),
-            password: password.value
-          })
+          body: JSON.stringify({ username: email, password })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (!res.ok) {
-          throw new Error(data.detail || 'Registration failed');
-        }
-
-        showStatus(statusEl, 'success', '✅ Account created! Redirecting...');
-        
-        localStorage.setItem('userId', data.user_id);
-        localStorage.setItem('userName', data.user_name);
-        localStorage.setItem('userRole', data.user_role);
-        localStorage.setItem('loginToken', data.access_token);
-
-        setTimeout(() => {
-          window.location.href = '/user-dashboard.html';
-        }, 800);
-      } catch (err) {
-        showStatus(statusEl, 'error', `❌ ${err.message}`);
-      } finally {
-        disableButton(btn, false, 'Create Free Account');
-      }
-    }
-
-    // User Login
-    async function loginUser() {
-      const username = document.getElementById('userUsername');
-      const password = document.getElementById('userPassword');
-      const statusEl = document.getElementById('userStatus');
-      const btn = document.getElementById('userLoginBtn');
-
-      const isValid = [
-        validateField(username, { required: true }),
-        validateField(password, { required: true })
-      ].every(v => v);
-
-      if (!isValid) return;
-
-      disableButton(btn, true, '<span class="spinner"></span>Logging in...');
-
-      try {
-        const res = await fetch(`${API_URL}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: username.value.trim(),
-            password: password.value
-          })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
+        if (!response.ok) {
           throw new Error(data.detail || 'Login failed');
         }
 
-        showStatus(statusEl, 'success', '✅ Login successful! Redirecting...');
-        
         localStorage.setItem('userId', data.user_id);
         localStorage.setItem('userName', data.user_name);
         localStorage.setItem('userRole', data.user_role);
         localStorage.setItem('loginToken', data.access_token);
 
+        showError('login', '✅ Login successful! Redirecting...');
         setTimeout(() => {
-          window.location.href = '/user-dashboard.html';
-        }, 800);
+          window.location.href = 'user-dashboard.html';
+        }, 1000);
+
       } catch (err) {
-        showStatus(statusEl, 'error', `❌ ${err.message}`);
-      } finally {
-        disableButton(btn, false, 'Login');
+        showError('login', '❌ ' + err.message);
       }
     }
 
-    // Admin Login
-    async function loginAdmin() {
-      const username = document.getElementById('adminUsername');
-      const apiKey = document.getElementById('adminKey');
-      const statusEl = document.getElementById('adminStatus');
-      const btn = document.getElementById('adminLoginBtn');
+    async function handleSignup(e) {
+      e.preventDefault();
+      const name = document.getElementById('signup-name').value;
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
 
-      const isValid = [
-        validateField(username, { required: true }),
-        validateField(apiKey, { required: true })
-      ].every(v => v);
+      if (password !== confirm) {
+        showError('signup', '❌ Passwords do not match');
+        return;
+      }
 
-      if (!isValid) return;
-
-      disableButton(btn, true, '<span class="spinner"></span>Verifying...');
+      if (password.length < 8) {
+        showError('signup', '❌ Password must be at least 8 characters');
+        return;
+      }
 
       try {
-        const res = await fetch(`${API_URL}/auth/admin`, {
+        const response = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: username.value.trim(),
-            admin_key: apiKey.value.trim()
-          })
+          body: JSON.stringify({ username: name, password })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (!res.ok) {
-          throw new Error(data.detail || 'Admin login failed');
+        if (!response.ok) {
+          throw new Error(data.detail || 'Registration failed');
         }
 
-        showStatus(statusEl, 'success', '✅ Admin login successful! Redirecting...');
-        
-        localStorage.setItem('userId', data.admin_id);
-        localStorage.setItem('userName', data.admin_name);
-        localStorage.setItem('userRole', 'admin');
+        localStorage.setItem('userId', data.user_id);
+        localStorage.setItem('userName', data.user_name);
+        localStorage.setItem('userRole', data.user_role);
         localStorage.setItem('loginToken', data.access_token);
 
+        showError('signup', '✅ Account created! Redirecting...');
         setTimeout(() => {
-          window.location.href = '/admin-dashboard.html';
-        }, 800);
+          window.location.href = 'user-dashboard.html';
+        }, 1000);
+
       } catch (err) {
-        showStatus(statusEl, 'error', `❌ ${err.message}`);
-      } finally {
-        disableButton(btn, false, 'Login as Admin');
+        showError('signup', '❌ ' + err.message);
       }
     }
-
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
-      initTabs();
-      
-      document.getElementById('registerBtn')?.addEventListener('click', registerUser);
-      document.getElementById('userLoginBtn')?.addEventListener('click', loginUser);
-      document.getElementById('adminLoginBtn')?.addEventListener('click', loginAdmin);
-
-      // Enter key support
-      document.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          const active = document.querySelector('.form-content.active');
-          if (active?.id === 'userLogin') loginUser();
-          else if (active?.id === 'userRegister') registerUser();
-          else if (active?.id === 'adminLogin') loginAdmin();
-        }
-      });
-    });
   </script>
 </body>
 </html>

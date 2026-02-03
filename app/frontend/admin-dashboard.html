@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - UNILAG Price Saver</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1234567890&libraries=places" async defer></script>
+    <link rel="stylesheet" href="css/design-system.css" />
     <style>
         /* --- Enhanced Professional Admin Dashboard CSS --- */
         * {
@@ -14,22 +14,22 @@
         }
 
         :root {
-            --primary: #667eea;
-            --primary-dark: #5568d3;
-            --danger: #FF3B30;
-            --success: #34C759;
-            --warning: #FF9500;
-            --info: #5AC8FA;
-            --light: #F2F2F7;
-            --text: #1a1a2e;
-            --bg: #ffffff;
-            --border: #E5E5EA;
-            --shadow: 0 4px 20px rgba(0,0,0,0.08);
-            --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-danger: linear-gradient(135deg, #FF3B30 0%, #FF6B6B 100%);
-            --gradient-success: linear-gradient(135deg, #34C759 0%, #5FD068 100%);
-            --gradient-warning: linear-gradient(135deg, #FF9500 0%, #FFA726 100%);
+            --primary: var(--color-primary);
+            --primary-dark: var(--color-primary-dark);
+            --danger: var(--color-danger);
+            --success: var(--color-success);
+            --warning: var(--color-warning);
+            --info: var(--color-primary-light);
+            --light: var(--color-bg-primary);
+            --text: var(--color-text-primary);
+            --bg: var(--color-bg-primary);
+            --border: var(--color-border);
+            --shadow: var(--shadow-md);
+            --shadow-hover: var(--shadow-lg);
+            --gradient: var(--gradient-primary);
+            --gradient-danger: linear-gradient(135deg, var(--color-danger) 0%, #FF6B6B 100%);
+            --gradient-success: linear-gradient(135deg, var(--color-success) 0%, #5FD068 100%);
+            --gradient-warning: linear-gradient(135deg, var(--color-warning) 0%, #FFA726 100%);
         }
 
         body.dark-mode {
